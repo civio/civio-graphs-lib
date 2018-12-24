@@ -1,0 +1,14 @@
+{
+	"name": "civio-graphs-lib",
+	"version": "0.1.2",
+  "description": "Civio's graphs library",
+  "license": "AGPL-3.0",
+  "repository": "civio/civio-graphs-lib",
+  "main": "index.js",
+  "keywords": [
+    "d3",
+    "graph",
+    "chart",
+    "visualization"
+  ]
+}
