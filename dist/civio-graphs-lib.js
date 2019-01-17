@@ -39,7 +39,22 @@ function tooltip () {
     return tooltip
   };
 
-  tooltip.setPosition = function (x, y) {
+  tooltip.show = function () {
+    // show tooltip element & point
+    el.style('opacity', 1);
+    point.attr('display', null);
+    return tooltip
+  };
+
+  tooltip.hide = function () {
+    // hide tooltip element & point
+    el.style('opacity', 0);
+    point.attr('display', 'none');
+    return tooltip
+  };
+
+  tooltip.setPosition = function (dataX) {
+    const { x, y } = tooltip.getPosition(dataX);
     const isRight = x > chart.width/2;
     // set point position
     point
@@ -68,7 +83,7 @@ function tooltip () {
     if (currentData !== d) {
       currentData = d;
       // set tooltip position
-      tooltip.setPosition(tooltip.getPositionX(currentData), tooltip.getPositionY(currentData));
+      tooltip.setPosition(tooltip.getPosition(currentData));
       // set tooltip label
       tooltip.setContent(chart.x(currentData), chart.y(currentData));
     }
@@ -77,23 +92,26 @@ function tooltip () {
 
   tooltip.onMouseEnter = function () {
     // show tooltip element & point
-    el.style('opacity', 1);
-    point.attr('display', null);
+    tooltip.show();
     return tooltip
   };
 
   tooltip.onMouseLeave = function () {
     // hide tooltip element & point
-    el.style('opacity', 0);
-    point.attr('display', 'none');
+    tooltip.hide();
     return tooltip
   };
 
-  tooltip.getPositionX = function (d) {
-    return chart.scaleX(chart.x(d))
-  };
-  tooltip.getPositionY = function (d) {
-    return chart.scaleY(chart.y(d))
+  tooltip.getPosition = function (date) {
+    // get data position for current date
+    const i = bisectDate(chart.data, date);
+    return (i < chart.data.length) ? {
+      x: chart.scaleX(date),
+      y: chart.scaleY(chart.y(chart.data[i]))
+    } : {
+      x: chart.scaleX(chart.x(chart.data[chart.data.length - 1])),
+      y: chart.scaleY(chart.y(chart.data[chart.data.length - 1]))
+    }
   };
 
   tooltip.getMouseData = function (x) {
@@ -169,11 +187,11 @@ class Chart {
   // Set scales
   setScales () {
     // setup x scale
-    this.scaleX = d3Scale.scaleUtc()
+    this.scaleX = this.getScaleX()
       .domain(this.scaleXDomain())
       .range(this.scaleXRange());
     // setup y scale
-    this.scaleY = d3Scale.scaleLinear()
+    this.scaleY = this.getScaleY()
       .domain(this.scaleYDomain()).nice()
       .range(this.scaleYRange());
     return this
@@ -235,6 +253,11 @@ class Chart {
     return this
   }
 
+  // Clear chart
+  clear () {
+    if (this.config.axis.x || this.config.axis.y) this.chart.selectAll('g').remove();
+  }
+
   // Set resize event listener
   setResize () {
     window.addEventListener('resize', lodash.debounce(() => this.onResize(), 150));
@@ -288,6 +311,14 @@ class Chart {
     return d3Format.format('d')
   }
 
+  // Get scales
+  getScaleX () {
+    return d3Scale.scaleTime()
+  }
+  getScaleY () {
+    return d3Scale.scaleLinear()
+  }
+
   // Get scale domains
   scaleXDomain () {
     return [this.x(this.data[0]), this.x(this.data[this.data.length-1])]
@@ -307,86 +338,86 @@ class Chart {
 
 class LineChart extends Chart{
 
-  constructor (selector, config) {
-    super(selector, config);
-  }
-
-  // Set scales
-  setScales () {
-    super.setScales();
-    return this
-  }
-
   // Setup line renderer
   setRenderer() {
     this.lineRenderer = d3Shape.line()
       .defined(d => !isNaN(this.y(d)))
       .x(d => this.scaleX(this.x(d)))
       .y(d => this.scaleY(this.y(d)));
+    return this
   }
 
   // Render chart
   render () {
     super.render();
-
     // Render chart line
     this.line = this.chart.append('path')
       .datum(this.data)
       .attr('class', 'line')
       .attr('d', this.lineRenderer);
+    return this
+  }
 
+  // Clear chart
+  clear () {
+    super.clear();
+    // Remove paths
+    this.chart.selectAll('path').remove();
     return this
   }
 
   // Resize chart
   resize () {
     super.resize();
-
     // Update line path
     if (this.line) this.line.attr('d', this.lineRenderer);
+    return this
+  }
 
+  // Set renderer curve
+  curve (type) {
+    this.lineRenderer.curve(type);
     return this
   }
 }
 
 class AreaChart extends LineChart{
 
-  constructor(selector, config) {
-    super(selector, config);
-  }
-
-  // setup line & area
+  // Setup line & area
   setRenderer() {
     super.setRenderer();
-
     // setup area renderer
-    this.area = d3Shape.area()
+    this.areaRenderer = d3Shape.area()
       .x(d => this.scaleX(this.x(d)))
-      .y0(this.height - this.config.margin.bottom)
+      .y0(this.scaleY(0))
       .y1(d => this.scaleY(this.y(d)));
+    return this
   }
 
-  // render chart
+  // Render chart
   render() {
     super.render();
-
-    // render chart area
-    this.chart.append('path')
+    // Render chart area
+    this.area = this.chart.append('path')
       .datum(this.data)
       .attr('class', 'area')
-      .attr('d', this.area);
+      .attr('d', this.areaRenderer);
+    return this
   }
 
   // resize chart
   resize() {
     super.resize();
-    
-    // resize area renderer
-    if (this.area) this.area.y0(this.height - this.config.margin.bottom);
+    // Uupdate area path
+    if (this.area) this.area.attr('d', this.areaRenderer);
+    return this
+  }
 
-    // re-render area path
-    this.chart.select('.area')
-      .attr('d', this.area);
+  // Set renderer curve
+  curve (type) {
+    super.curve(type);
+    this.areaRenderer.curve(type);
+    return this
   }
 }
 
