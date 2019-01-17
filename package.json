@@ -8,7 +8,7 @@
     "url": "https://github.com/rauldiazpoblete"
   },
   "repository": "civio/civio-graphs-lib",
-  "main": "src/index.js",
+  "module": "src/index.js",
   "dependencies": {
     "d3": "^5.7.0",
     "lodash": "^4.17.11"
