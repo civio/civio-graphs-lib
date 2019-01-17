@@ -1,11 +1,10 @@
-import {select} from 'd3-selection'
 import {line} from 'd3-shape'
+
 import Chart from './chart'
 
 export default class LineChart extends Chart{
 
   constructor (selector, config) {
-    console.log('LineChart')
     super(selector, config)
   }
 
