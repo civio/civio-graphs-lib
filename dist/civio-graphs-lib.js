@@ -1,10 +1,11 @@
+// civio-graphs-lib v0.1.3 Copyright 2019 Raúl Díaz Poblete
 (function (global, factory) {
-typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3'), require('lodash')) :
-typeof define === 'function' && define.amd ? define(['exports', 'd3', 'lodash'], factory) :
-(factory((global['civio-graphs-lib'] = global['civio-graphs-lib'] || {}),global.d3,global.lodash));
-}(this, (function (exports,d3,lodash) { 'use strict';
+typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-axis'), require('d3-format'), require('d3-scale'), require('d3-selection'), require('d3-time'), require('d3-time-format'), require('lodash')) :
+typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-axis', 'd3-format', 'd3-scale', 'd3-selection', 'd3-time', 'd3-time-format', 'lodash'], factory) :
+(factory((global['civio-graphs-lib'] = global['civio-graphs-lib'] || {}),global.d3Array,global.d3Axis,global.d3Format,global.d3Scale,global.d3Selection,global.d3Time,global.d3TimeFormat,global.lodash));
+}(this, (function (exports,d3Array,d3Axis,d3Format,d3Scale,d3Selection,d3Time,d3TimeFormat,lodash) { 'use strict';
 
-// import tooltip from './tooltip'
+//import tooltip from './tooltip'
 
 const configDefaults = {
   // we can define an aspectRatio to calculate height or define a fixed height
@@ -32,19 +33,19 @@ class Chart {
 
   constructor (selector, config) {
     // Select chart container
-    this.el = select(selector);
+    this.el = d3Selection.select(selector);
     // Setup config object
     this.config = lodash.defaultsDeep(config, configDefaults);
     this.width = 0;
     // Set formatDefaultLocale based on config.lang
-    formatDefaultLocale({
+    d3Format.formatDefaultLocale({
       decimal: (this.config.lang === 'es') ? ',' : '.',
       thousands: (this.config.lang === 'es') ? '.' : ',',
       currency: this.config.format.currency
     });
     // Set default formats after formatDefaultLocale defined
-    this.config.format.x = timeFormat('%B %d, %Y');
-    this.config.format.y = format('$,.1f');
+    this.config.format.x = d3TimeFormat.timeFormat('%B %d, %Y');
+    this.config.format.y = d3Format.format('$,.1f');
     // Set data accesors
     this.x = (d) => d.date;
     this.y = (d) => d.value;
@@ -59,18 +60,18 @@ class Chart {
   }
 
   setTooltip () {
-    // this.tooltip = tooltip()
+    //this.tooltip = tooltip()
     //  .setup(this)
   }
 
   // Set scales
   setScales () {
     // setup x scale
-    this.scaleX = scaleUtc()
+    this.scaleX = d3Scale.scaleUtc()
       .domain(this.scaleXDomain())
       .range(this.scaleXRange());
     // setup y scale
-    this.scaleY = scaleLinear()
+    this.scaleY = d3Scale.scaleLinear()
       .domain(this.scaleYDomain()).nice()
       .range(this.scaleYRange());
     return this
@@ -127,7 +128,7 @@ class Chart {
       this.chart.append('g')
         .call(this.axisY);
     }
-    // this.tooltip.render()
+    //this.tooltip.render()
     this.setResize();
     return this
   }
@@ -159,8 +160,8 @@ class Chart {
     if (this.scaleX) this.scaleX.range(this.scaleXRange());
     if (this.scaleY) this.scaleY.range(this.scaleYRange());
     // Resize axis
-    if (this.axisX) select('.x.axis').call(this.axisX);
-    if (this.axisY) select('.y.axis').call(this.axisY);
+    if (this.axisX) d3Selection.select('.x.axis').call(this.axisX);
+    if (this.axisY) d3Selection.select('.y.axis').call(this.axisY);
     return this
   }
 
@@ -168,21 +169,21 @@ class Chart {
 
   // Setup axis renderers & formats
   axisRendererX () {
-    return axisBottom(this.scaleX)
+    return d3Axis.axisBottom(this.scaleX)
       .tickSizeOuter(0)
       .tickFormat(this.axisFormatX())
-      .ticks(timeYear)
+      .ticks(d3Time.timeYear)
   }
   axisRendererY () {
-    return axisLeft(this.scaleY)
+    return d3Axis.axisLeft(this.scaleY)
       .tickFormat(this.axisFormatY())
       .ticks(this.height / 80)
   }
   axisFormatX () {
-    return timeFormat('%Y')
+    return d3TimeFormat.timeFormat('%Y')
   }
   axisFormatY () {
-    return format('d')
+    return d3Format.format('d')
   }
 
   // Get scale domains
@@ -190,7 +191,7 @@ class Chart {
     return [this.x(this.data[0]), this.x(this.data[this.data.length-1])]
   }
   scaleYDomain () {
-    return extent(this.data, this.y)
+    return d3Array.extent(this.data, this.y)
   }
 
   // Get scale ranges
