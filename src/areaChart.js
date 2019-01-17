@@ -4,41 +4,40 @@ import LineChart from './lineChart'
 
 export default class AreaChart extends LineChart{
 
-  constructor(selector, config) {
-    super(selector, config)
-  }
-
-  // setup line & area
+  // Setup line & area
   setRenderer() {
     super.setRenderer()
-
     // setup area renderer
-    this.area = area()
+    this.areaRenderer = area()
       .x(d => this.scaleX(this.x(d)))
-      .y0(this.height - this.config.margin.bottom)
+      .y0(this.scaleY(0))
       .y1(d => this.scaleY(this.y(d)))
+    return this
   }
 
-  // render chart
+  // Render chart
   render() {
     super.render()
-
-    // render chart area
-    this.chart.append('path')
+    // Render chart area
+    this.area = this.chart.append('path')
       .datum(this.data)
       .attr('class', 'area')
-      .attr('d', this.area)
+      .attr('d', this.areaRenderer)
+    return this
   }
 
   // resize chart
   resize() {
     super.resize()
-    
-    // resize area renderer
-    if (this.area) this.area.y0(this.height - this.config.margin.bottom)
+    // Uupdate area path
+    if (this.area) this.area.attr('d', this.areaRenderer)
+    return this
+  }
 
-    // re-render area path
-    this.chart.select('.area')
-      .attr('d', this.area)
+  // Set renderer curve
+  curve (type) {
+    super.curve(type)
+    this.areaRenderer.curve(type)
+    return this
   }
 }
