@@ -1,10 +1,10 @@
 import {area} from 'd3-shape'
+
 import LineChart from './lineChart'
 
 export default class AreaChart extends LineChart{
 
   constructor(selector, config) {
-    console.log('AreChart')
     super(selector, config)
   }
 
