@@ -1,11 +1,10 @@
-export default function () {
+import {select} from 'd3-selection'
 
-  function test () {}
+export default class {
 
-  test.run = function () {
-    console.log('Run test!')
-    return test
+  constructor (selector) {
+    // Select chart container
+    this.el = select(selector)
+    this.el.append('svg')
   }
-
-  return test
 }
