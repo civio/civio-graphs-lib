@@ -1,26 +1,15 @@
-import * as meta from "./package.json";
-
-const config = {
-  input: "src/index.js",
-  external: Object.keys(meta.dependencies || {}),
+export default {
+  input: 'src/index.js',
+  external: ['d3'],
   output: {
-    file: `dist/${meta.name}.js`,
-    name: meta.name,
-    format: "umd",
+    file: 'dist/civio-graphs-lib.js',
+    name: 'civio-graphs-lib',
+    format: 'umd',
     indent: false,
     extend: true,
-    globals: Object.assign({}, ...Object.keys(meta.dependencies || {}))
+    globals: {
+      d3: 'd3'
+    }
   },
   plugins: []
 };
-
-export default [
-  config,
-  {
-    ...config,
-    output: {
-      ...config.output,
-      file: `dist/${meta.name}.min.js`
-    }
-  }
-];
