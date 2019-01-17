@@ -22,7 +22,9 @@
     "compile": "rollup -c",
     "prepublishOnly": "npm run compile"
   },
-  "dependencies": {},
+  "dependencies": {
+    "d3": "^5.7.0"
+  },
   "devDependencies": {
     "eslint": "5",
     "rollup": "0.64",
