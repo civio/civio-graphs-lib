@@ -1,6 +1,12 @@
-import * as d3 from 'd3'
+import {extent} from 'd3-array'
+import {axisLeft, axisBottom} from 'd3-axis'
+import {format, formatDefaultLocale} from 'd3-format'
+import {scaleLinear, scaleUtc} from 'd3-scale'
+import {select} from 'd3-selection'
+import {timeYear} from 'd3-time'
+import {timeFormat} from 'd3-time-format'
 import {debounce, defaultsDeep} from 'lodash'
-// import tooltip from './tooltip'
+//import tooltip from './tooltip'
 
 const configDefaults = {
   // we can define an aspectRatio to calculate height or define a fixed height
@@ -55,7 +61,7 @@ export default class Chart {
   }
 
   setTooltip () {
-    // this.tooltip = tooltip()
+    //this.tooltip = tooltip()
     //  .setup(this)
   }
 
@@ -123,7 +129,7 @@ export default class Chart {
       this.chart.append('g')
         .call(this.axisY)
     }
-    // this.tooltip.render()
+    //this.tooltip.render()
     this.setResize()
     return this
   }
