@@ -1,15 +1,36 @@
-export default {
+import {terser} from "rollup-plugin-terser";
+import * as meta from "./package.json";
+
+const config = {
   input: 'src/index.js',
-  external: ['d3'],
+  external: Object.keys(meta.dependencies || {}).filter(key => /^d3-/.test(key)),
   output: {
-    file: 'dist/civio-graphs-lib.js',
-    name: 'civio-graphs-lib',
+    file: `dist/${meta.name}.js`,
+    name: meta.name,
     format: 'umd',
     indent: false,
     extend: true,
-    globals: {
-      d3: 'd3'
-    }
+    banner: `// ${meta.name} v${meta.version} Copyright ${(new Date).getFullYear()} ${meta.author.name}`,
+    globals: Object.assign({}, ...Object.keys(meta.dependencies || {}).filter(key => /^d3-/.test(key)).map(key => ({[key]: 'd3'})))
   },
   plugins: []
 };
+
+export default [
+  config,
+  {
+    ...config,
+    output: {
+      ...config.output,
+      file: `dist/${meta.name}.min.js`
+    },
+    plugins: [
+      ...config.plugins,
+      terser({
+        output: {
+          preamble: config.output.banner
+        }
+      })
+    ]
+  }
+];
