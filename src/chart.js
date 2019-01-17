@@ -5,8 +5,10 @@ import {scaleLinear, scaleUtc} from 'd3-scale'
 import {select} from 'd3-selection'
 import {timeYear} from 'd3-time'
 import {timeFormat} from 'd3-time-format'
+
 import {debounce, defaultsDeep} from 'lodash'
-//import tooltip from './tooltip'
+
+import tooltip from './tooltip'
 
 const configDefaults = {
   // we can define an aspectRatio to calculate height or define a fixed height
@@ -61,8 +63,8 @@ export default class Chart {
   }
 
   setTooltip () {
-    //this.tooltip = tooltip()
-    //  .setup(this)
+    this.tooltip = tooltip()
+      .setup(this)
   }
 
   // Set scales
@@ -129,7 +131,7 @@ export default class Chart {
       this.chart.append('g')
         .call(this.axisY)
     }
-    //this.tooltip.render()
+    this.tooltip.render()
     this.setResize()
     return this
   }
