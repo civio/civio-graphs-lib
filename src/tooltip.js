@@ -1,6 +1,5 @@
 import {bisector} from 'd3-array'
 import {event, select} from 'd3-selection'
-import LineChart from './lineChart'
 
 export default function () {
   let el,
