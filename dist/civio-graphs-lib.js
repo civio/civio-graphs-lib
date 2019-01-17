@@ -1,11 +1,113 @@
 // civio-graphs-lib v0.1.3 Copyright 2019 Raúl Díaz Poblete
 (function (global, factory) {
-typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-axis'), require('d3-format'), require('d3-scale'), require('d3-selection'), require('d3-time'), require('d3-time-format'), require('lodash')) :
-typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-axis', 'd3-format', 'd3-scale', 'd3-selection', 'd3-time', 'd3-time-format', 'lodash'], factory) :
-(factory((global['civio-graphs-lib'] = global['civio-graphs-lib'] || {}),global.d3Array,global.d3Axis,global.d3Format,global.d3Scale,global.d3Selection,global.d3Time,global.d3TimeFormat,global.lodash));
-}(this, (function (exports,d3Array,d3Axis,d3Format,d3Scale,d3Selection,d3Time,d3TimeFormat,lodash) { 'use strict';
+typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-selection'), require('d3-axis'), require('d3-format'), require('d3-scale'), require('d3-time'), require('d3-time-format'), require('lodash')) :
+typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-selection', 'd3-axis', 'd3-format', 'd3-scale', 'd3-time', 'd3-time-format', 'lodash'], factory) :
+(factory((global['civio-graphs-lib'] = global['civio-graphs-lib'] || {}),global.d3Array,global.d3Selection,global.d3Axis,global.d3Format,global.d3Scale,global.d3Time,global.d3TimeFormat,global.lodash));
+}(this, (function (exports,d3Array,d3Selection,d3Axis,d3Format,d3Scale,d3Time,d3TimeFormat,lodash) { 'use strict';
 
-//import tooltip from './tooltip'
+function tooltip () {
+  let el,
+      chart,
+      point,
+      bisectDate,
+      currentData = 0;
+
+  function tooltip () {}
+
+  tooltip.setup = function (_chart) {
+    chart = _chart;
+    // get tooltip element from chart container
+    el = chart.el.select('.tooltip');
+    return tooltip
+  };
+
+  tooltip.render = function () {
+    // Skip if there is no tooltip element 
+    if (!el || el.empty()) return tooltip
+    // Setup bisectDate for mouse move
+    bisectDate = d3Array.bisector(chart.x).left;
+    // Setup chart point
+    point = chart.chart.append('circle')
+      .attr('class', 'tooltip-point')
+      .attr('display', 'none')
+      .attr('r', 4);
+    // Set mouse events
+    chart.chart
+      .on('mousemove', tooltip.onMouseMove)
+      .on('mouseenter', tooltip.onMouseEnter)
+      .on('mouseleave', tooltip.onMouseLeave);
+    return tooltip
+  };
+
+  tooltip.setPosition = function (x, y) {
+    const isRight = x > chart.width/2;
+    // set point position
+    point
+      .attr('transform', `translate(${x}, ${y})`);
+    // set tooltip position
+    el
+      .style('left', isRight ? 'auto' : `${x}px`)
+      .style('right',isRight ? `${chart.width - x}px` : 'auto')
+      .style('top', `${y}px`)
+      .classed('right', isRight);
+    return tooltip
+  };
+
+  tooltip.setContent = function (x, y) {
+    // Set label x value
+    el.select('.label.x')
+      .html(chart.config.format.x(x));
+    // Set label y value
+    el.select('.label.y')
+      .html(chart.config.format.y(y));
+  };
+
+  tooltip.onMouseMove = function () {
+    // get current data by mouse position
+    const d = tooltip.getMouseData(d3Selection.event.layerX, d3Selection.event.layerY);
+    if (currentData !== d) {
+      currentData = d;
+      // set tooltip position
+      tooltip.setPosition(tooltip.getPositionX(currentData), tooltip.getPositionY(currentData));
+      // set tooltip label
+      tooltip.setContent(chart.x(currentData), chart.y(currentData));
+    }
+    return tooltip
+  };
+
+  tooltip.onMouseEnter = function () {
+    // show tooltip element & point
+    el.style('opacity', 1);
+    point.attr('display', null);
+    return tooltip
+  };
+
+  tooltip.onMouseLeave = function () {
+    // hide tooltip element & point
+    el.style('opacity', 0);
+    point.attr('display', 'none');
+    return tooltip
+  };
+
+  tooltip.getPositionX = function (d) {
+    return chart.scaleX(chart.x(d))
+  };
+  tooltip.getPositionY = function (d) {
+    return chart.scaleY(chart.y(d))
+  };
+
+  tooltip.getMouseData = function (x, y) {
+    // get mouse position
+    const mouseX = chart.scaleX.invert(x);
+    // calculate current data
+    const i = bisectDate(chart.data, mouseX, 1);
+    const d0 = chart.data[i - 1];
+    const d1 = chart.data[i];
+    return (d1 && mouseX - chart.x(d0) > chart.x(d1) - mouseX) ? d1 : d0
+  };
+
+  return tooltip
+}
 
 const configDefaults = {
   // we can define an aspectRatio to calculate height or define a fixed height
@@ -60,8 +162,8 @@ class Chart {
   }
 
   setTooltip () {
-    //this.tooltip = tooltip()
-    //  .setup(this)
+    this.tooltip = tooltip()
+      .setup(this);
   }
 
   // Set scales
@@ -128,7 +230,7 @@ class Chart {
       this.chart.append('g')
         .call(this.axisY);
     }
-    //this.tooltip.render()
+    this.tooltip.render();
     this.setResize();
     return this
   }
