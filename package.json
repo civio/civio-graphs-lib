@@ -2,21 +2,30 @@
   "name": "civio-graphs-lib",
   "version": "0.1.3",
   "description": "Civio's graphs library",
+  "keywords": [
+    "d3",
+    "graph",
+    "chart",
+    "visualization"
+  ],
   "license": "AGPL-3.0",
   "author": {
     "name": "Raúl Díaz Poblete",
     "url": "https://github.com/rauldiazpoblete"
   },
   "repository": "civio/civio-graphs-lib",
+  "main": "dist/civio-graphs-lib.js",
+  "unpkg": "dist/civio-graphs-lib.min.js",
+  "jsdelivr": "dist/civio-graphs-lib.min.js",
   "module": "src/index.js",
-  "dependencies": {
-    "d3": "^5.7.0",
-    "lodash": "^4.17.11"
+  "scripts": {
+    "compile": "rollup -c",
+    "prepublishOnly": "compile"
   },
-  "keywords": [
-    "d3",
-    "graph",
-    "chart",
-    "visualization"
-  ]
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "5",
+    "rollup": "0.64",
+    "rollup-plugin-terser": "1"
+  }
 }
