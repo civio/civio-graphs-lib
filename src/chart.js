@@ -70,11 +70,11 @@ export default class Chart {
   // Set scales
   setScales () {
     // setup x scale
-    this.scaleX = scaleTime()
+    this.scaleX = this.getScaleX()
       .domain(this.scaleXDomain())
       .range(this.scaleXRange())
     // setup y scale
-    this.scaleY = scaleLinear()
+    this.scaleY = this.getScaleY()
       .domain(this.scaleYDomain()).nice()
       .range(this.scaleYRange())
     return this
@@ -192,6 +192,14 @@ export default class Chart {
   }
   axisFormatY () {
     return format('d')
+  }
+
+  // Get scales
+  getScaleX () {
+    return scaleTime()
+  }
+  getScaleY () {
+    return scaleLinear()
   }
 
   // Get scale domains
