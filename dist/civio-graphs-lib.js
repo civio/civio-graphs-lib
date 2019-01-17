@@ -1,9 +1,9 @@
 // civio-graphs-lib v0.1.3 Copyright 2019 Raúl Díaz Poblete
 (function (global, factory) {
-typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-selection'), require('d3-axis'), require('d3-format'), require('d3-scale'), require('d3-time'), require('d3-time-format'), require('lodash')) :
-typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-selection', 'd3-axis', 'd3-format', 'd3-scale', 'd3-time', 'd3-time-format', 'lodash'], factory) :
-(factory((global['civio-graphs-lib'] = global['civio-graphs-lib'] || {}),global.d3Array,global.d3Selection,global.d3Axis,global.d3Format,global.d3Scale,global.d3Time,global.d3TimeFormat,global.lodash));
-}(this, (function (exports,d3Array,d3Selection,d3Axis,d3Format,d3Scale,d3Time,d3TimeFormat,lodash) { 'use strict';
+typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-selection'), require('d3-axis'), require('d3-format'), require('d3-scale'), require('d3-time'), require('d3-time-format'), require('lodash'), require('d3-shape')) :
+typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-selection', 'd3-axis', 'd3-format', 'd3-scale', 'd3-time', 'd3-time-format', 'lodash', 'd3-shape'], factory) :
+(factory((global['civio-graphs-lib'] = global['civio-graphs-lib'] || {}),global.d3Array,global.d3Selection,global.d3Axis,global.d3Format,global.d3Scale,global.d3Time,global.d3TimeFormat,global.lodash,global.d3Shape));
+}(this, (function (exports,d3Array,d3Selection,d3Axis,d3Format,d3Scale,d3Time,d3TimeFormat,lodash,d3Shape) { 'use strict';
 
 function tooltip () {
   let el,
@@ -305,7 +305,95 @@ class Chart {
   }
 }
 
+class LineChart extends Chart{
+
+  constructor (selector, config) {
+    super(selector, config);
+  }
+
+  // Set scales
+  setScales () {
+    super.setScales();
+    return this
+  }
+
+  // Setup line renderer
+  setRenderer() {
+    this.lineRenderer = d3Shape.line()
+      .defined(d => !isNaN(this.y(d)))
+      .x(d => this.scaleX(this.x(d)))
+      .y(d => this.scaleY(this.y(d)));
+  }
+
+  // Render chart
+  render () {
+    super.render();
+
+    // Render chart line
+    this.line = this.chart.append('path')
+      .datum(this.data)
+      .attr('class', 'line')
+      .attr('d', this.lineRenderer);
+
+    return this
+  }
+
+  // Resize chart
+  resize () {
+    super.resize();
+
+    // Update line path
+    if (this.line) this.line.attr('d', this.lineRenderer);
+
+    return this
+  }
+}
+
+class AreaChart extends LineChart{
+
+  constructor(selector, config) {
+    super(selector, config);
+  }
+
+  // setup line & area
+  setRenderer() {
+    super.setRenderer();
+
+    // setup area renderer
+    this.area = d3Shape.area()
+      .x(d => this.scaleX(this.x(d)))
+      .y0(this.height - this.config.margin.bottom)
+      .y1(d => this.scaleY(this.y(d)));
+  }
+
+  // render chart
+  render() {
+    super.render();
+
+    // render chart area
+    this.chart.append('path')
+      .datum(this.data)
+      .attr('class', 'area')
+      .attr('d', this.area);
+  }
+
+  // resize chart
+  resize() {
+    super.resize();
+    
+    // resize area renderer
+    if (this.area) this.area.y0(this.height - this.config.margin.bottom);
+
+    // re-render area path
+    this.chart.select('.area')
+      .attr('d', this.area);
+  }
+}
+
 exports.Chart = Chart;
+exports.AreaChart = AreaChart;
+exports.LineChart = LineChart;
+exports.tooltip = tooltip;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
