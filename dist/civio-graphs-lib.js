@@ -64,7 +64,7 @@ function tooltip () {
 
   tooltip.onMouseMove = function () {
     // get current data by mouse position
-    const d = tooltip.getMouseData(d3Selection.event.layerX, d3Selection.event.layerY);
+    const d = tooltip.getMouseData(d3Selection.event.layerX);
     if (currentData !== d) {
       currentData = d;
       // set tooltip position
@@ -96,7 +96,7 @@ function tooltip () {
     return chart.scaleY(chart.y(d))
   };
 
-  tooltip.getMouseData = function (x, y) {
+  tooltip.getMouseData = function (x) {
     // get mouse position
     const mouseX = chart.scaleX.invert(x);
     // calculate current data
