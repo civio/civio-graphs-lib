@@ -20,7 +20,7 @@
   "module": "src/index.js",
   "scripts": {
     "compile": "rollup -c",
-    "prepublishOnly": "compile"
+    "prepublishOnly": "npm run compile"
   },
   "dependencies": {},
   "devDependencies": {
