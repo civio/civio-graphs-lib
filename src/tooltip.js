@@ -35,7 +35,22 @@ export default function () {
     return tooltip
   }
 
-  tooltip.setPosition = function (x, y) {
+  tooltip.show = function () {
+    // show tooltip element & point
+    el.style('opacity', 1)
+    point.attr('display', null)
+    return tooltip
+  }
+
+  tooltip.hide = function () {
+    // hide tooltip element & point
+    el.style('opacity', 0)
+    point.attr('display', 'none')
+    return tooltip
+  }
+
+  tooltip.setPosition = function (dataX) {
+    const { x, y } = tooltip.getPosition(dataX)
     const isRight = x > chart.width/2
     // set point position
     point
@@ -64,7 +79,7 @@ export default function () {
     if (currentData !== d) {
       currentData = d
       // set tooltip position
-      tooltip.setPosition(tooltip.getPositionX(currentData), tooltip.getPositionY(currentData))
+      tooltip.setPosition(tooltip.getPosition(currentData))
       // set tooltip label
       tooltip.setContent(chart.x(currentData), chart.y(currentData))
     }
@@ -73,23 +88,26 @@ export default function () {
 
   tooltip.onMouseEnter = function () {
     // show tooltip element & point
-    el.style('opacity', 1)
-    point.attr('display', null)
+    tooltip.show()
     return tooltip
   }
 
   tooltip.onMouseLeave = function () {
     // hide tooltip element & point
-    el.style('opacity', 0)
-    point.attr('display', 'none')
+    tooltip.hide()
     return tooltip
   }
 
-  tooltip.getPositionX = function (d) {
-    return chart.scaleX(chart.x(d))
-  }
-  tooltip.getPositionY = function (d) {
-    return chart.scaleY(chart.y(d))
+  tooltip.getPosition = function (date) {
+    // get data position for current date
+    const i = bisectDate(chart.data, date)
+    return (i < chart.data.length) ? {
+      x: chart.scaleX(date),
+      y: chart.scaleY(chart.y(chart.data[i]))
+    } : {
+      x: chart.scaleX(chart.x(chart.data[chart.data.length - 1])),
+      y: chart.scaleY(chart.y(chart.data[chart.data.length - 1]))
+    }
   }
 
   tooltip.getMouseData = function (x) {
