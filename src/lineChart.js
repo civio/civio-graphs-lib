@@ -35,6 +35,15 @@ export default class LineChart extends Chart{
     return this
   }
 
+  // Clear chart
+  clear () {
+    super.clear()
+
+    this.chart.selectAll('path').remove()
+
+    return this
+  }
+
   // Resize chart
   resize () {
     super.resize()

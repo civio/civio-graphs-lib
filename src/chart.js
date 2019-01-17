@@ -1,7 +1,7 @@
 import {extent} from 'd3-array'
 import {axisLeft, axisBottom} from 'd3-axis'
 import {format, formatDefaultLocale} from 'd3-format'
-import {scaleLinear, scaleUtc} from 'd3-scale'
+import {scaleLinear, scaleTime} from 'd3-scale'
 import {select} from 'd3-selection'
 import {timeYear} from 'd3-time'
 import {timeFormat} from 'd3-time-format'
@@ -70,7 +70,7 @@ export default class Chart {
   // Set scales
   setScales () {
     // setup x scale
-    this.scaleX = scaleUtc()
+    this.scaleX = scaleTime()
       .domain(this.scaleXDomain())
       .range(this.scaleXRange())
     // setup y scale
@@ -134,6 +134,11 @@ export default class Chart {
     this.tooltip.render()
     this.setResize()
     return this
+  }
+
+  // Clear chart
+  clear () {
+    if (this.config.axis.x || this.config.axis.y) this.chart.selectAll('g').remove()
   }
 
   // Set resize event listener
