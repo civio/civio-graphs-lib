@@ -59,7 +59,7 @@ export default class Chart {
       })
     }
     // Set default formats after formatDefaultLocale defined
-    if (!this.config.format.x) this.config.format.x = timeFormat('%B %d, %Y')
+    if (!this.config.format.x) this.config.format.x = (this.config.lang === 'es') ? timeFormat('%d %B, %Y') : timeFormat('%B %d, %Y')
     if (!this.config.format.y) this.config.format.y = format('$,.1f')
     // Set data accesors
     this.x = (d) => d.date
