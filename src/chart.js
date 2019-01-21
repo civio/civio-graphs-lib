@@ -24,11 +24,6 @@ const configDefaults = {
   axis: {
     x: true,
     y: true
-  },
-  format: {
-    x: null,
-    y: null,
-    currency: ['', '\u00a0€']
   }
 }
 
