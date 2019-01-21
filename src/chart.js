@@ -40,30 +40,6 @@ export default class Chart {
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
     this.width = 0
-    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
-    formatDefaultLocale({
-      decimal: (this.config.lang === 'es') ? ',' : '.',
-      thousands: (this.config.lang === 'es') ? '.' : ',',
-      currency: this.config.format.currency
-    })
-    if (this.config.lang === 'es') {
-      timeFormatDefaultLocale({
-        dateTime: '%A, %e de %B de %Y, %X',
-        date: '%d/%m/%Y',
-        time: '%H:%M:%S',
-        periods: ['AM', 'PM'],
-        days: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
-        shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-        months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-        shortMonths: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
-      })
-    }
-    // Set default formats after formatDefaultLocale defined
-    this.config.format.x = this.config.format.x | timeFormat((this.config.lang === 'es') ? '%d %B, %Y' : '%B %d, %Y')
-    this.config.format.y = this.config.format.y | format('$,.1f')
-    // Set data accesors
-    this.x = (d) => d.date
-    this.y = (d) => d.value
     // Set chart & tooltip
     this.setChart()
     this.setTooltip()
@@ -77,6 +53,28 @@ export default class Chart {
   setTooltip () {
     this.tooltip = tooltip()
       .setup(this)
+  }
+
+  // Set formats
+  setFormat () {
+    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
+    formatDefaultLocale({
+      decimal: (this.config.lang === 'es') ? ',' : '.',
+      thousands: (this.config.lang === 'es') ? '.' : ',',
+      currency: this.currencyFormat()
+    })
+    if (this.config.lang === 'es') {
+      timeFormatDefaultLocale({
+        dateTime: '%A, %e de %B de %Y, %X',
+        date: '%d/%m/%Y',
+        time: '%H:%M:%S',
+        periods: ['AM', 'PM'],
+        days: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+        shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+        months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+        shortMonths: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+      })
+    }
   }
 
   // Set scales
@@ -126,6 +124,7 @@ export default class Chart {
 
   setup (data) {
     this.data = data
+    this.setFormat()
     this.onResize()
     this.setScales()
     this.setAxis()
@@ -187,6 +186,14 @@ export default class Chart {
 
   // Getters
 
+  // Set data accesors
+  x (d) {
+    return d.date
+  }
+  y (d) {
+    return d.value
+  }
+
   // Setup axis renderers & formats
   axisRendererX () {
     return axisBottom(this.scaleX)
@@ -204,6 +211,17 @@ export default class Chart {
   }
   axisFormatY () {
     return format('d')
+  }
+
+  // tooltip formats
+  tooltipFormatX () {
+    return timeFormat((this.config.lang === 'es') ? '%d %B, %Y' : '%B %d, %Y')
+  } 
+  tooltipFormatY () {
+    return format('$,.1f')
+  }
+  currencyFormat () {
+    return ['', '\u00a0€']
   }
 
   // Get scales
