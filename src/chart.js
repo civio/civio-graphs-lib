@@ -59,8 +59,8 @@ export default class Chart {
       })
     }
     // Set default formats after formatDefaultLocale defined
-    this.config.format.x = timeFormat('%B %d, %Y')
-    this.config.format.y = format('$,.1f')
+    if (!this.config.format.x) this.config.format.x = timeFormat('%B %d, %Y')
+    if (!this.config.format.y) this.config.format.y = format('$,.1f')
     // Set data accesors
     this.x = (d) => d.date
     this.y = (d) => d.value
