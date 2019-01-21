@@ -83,7 +83,7 @@ function tooltip () {
     if (currentData !== d) {
       currentData = d;
       // set tooltip position
-      tooltip.setPosition(tooltip.getPosition(currentData));
+      tooltip.setPosition(currentData);
       // set tooltip label
       tooltip.setContent(chart.x(currentData), chart.y(currentData));
     }
