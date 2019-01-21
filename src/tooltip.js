@@ -98,15 +98,13 @@ export default function () {
     return tooltip
   }
 
-  tooltip.getPosition = function (date) {
+  tooltip.getPosition = function (data) {
     // get data position for current date
-    const i = bisectDate(chart.data, date)
-    return (i < chart.data.length) ? {
-      x: chart.scaleX(date),
-      y: chart.scaleY(chart.y(chart.data[i]))
-    } : {
-      x: chart.scaleX(chart.x(chart.data[chart.data.length - 1])),
-      y: chart.scaleY(chart.y(chart.data[chart.data.length - 1]))
+    const i = bisectDate(chart.data, chart.x(data))
+    const d = (i < chart.data.length) ? chart.data[i] : chart.data[chart.data.length - 1]
+    return {
+      x: chart.scaleX(chart.x(d)),
+      y: chart.scaleY(chart.y(d))
     }
   }
 
