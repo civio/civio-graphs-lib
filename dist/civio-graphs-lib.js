@@ -71,10 +71,10 @@ function tooltip () {
   tooltip.setContent = function (x, y) {
     // Set label x value
     el.select('.label.x')
-      .html(chart.tooltipFormatX(x));
+      .html(chart.tooltipFormatX()(x));
     // Set label y value
     el.select('.label.y')
-      .html(chart.tooltipFormatY(y));
+      .html(chart.tooltipFormatY()(y));
   };
 
   tooltip.onMouseMove = function () {
@@ -139,11 +139,6 @@ const configDefaults = {
   axis: {
     x: true,
     y: true
-  },
-  format: {
-    x: null,
-    y: null,
-    currency: ['', '\u00a0€']
   }
 };
 
