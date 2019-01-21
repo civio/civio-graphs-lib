@@ -155,30 +155,6 @@ class Chart {
     // Setup config object
     this.config = lodash.defaultsDeep(config, configDefaults);
     this.width = 0;
-    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
-    d3Format.formatDefaultLocale({
-      decimal: (this.config.lang === 'es') ? ',' : '.',
-      thousands: (this.config.lang === 'es') ? '.' : ',',
-      currency: this.config.format.currency
-    });
-    if (this.config.lang === 'es') {
-      d3TimeFormat.timeFormatDefaultLocale({
-        dateTime: '%A, %e de %B de %Y, %X',
-        date: '%d/%m/%Y',
-        time: '%H:%M:%S',
-        periods: ['AM', 'PM'],
-        days: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
-        shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-        months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-        shortMonths: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
-      });
-    }
-    // Set default formats after formatDefaultLocale defined
-    this.config.format.x = this.config.format.x | d3TimeFormat.timeFormat((this.config.lang === 'es') ? '%d %B, %Y' : '%B %d, %Y');
-    this.config.format.y = this.config.format.y | d3Format.format('$,.1f');
-    // Set data accesors
-    this.x = (d) => d.date;
-    this.y = (d) => d.value;
     // Set chart & tooltip
     this.setChart();
     this.setTooltip();
@@ -192,6 +168,28 @@ class Chart {
   setTooltip () {
     this.tooltip = tooltip()
       .setup(this);
+  }
+
+  // Set formats
+  setFormat () {
+    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
+    d3Format.formatDefaultLocale({
+      decimal: (this.config.lang === 'es') ? ',' : '.',
+      thousands: (this.config.lang === 'es') ? '.' : ',',
+      currency: this.currencyFormat()
+    });
+    if (this.config.lang === 'es') {
+      d3TimeFormat.timeFormatDefaultLocale({
+        dateTime: '%A, %e de %B de %Y, %X',
+        date: '%d/%m/%Y',
+        time: '%H:%M:%S',
+        periods: ['AM', 'PM'],
+        days: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+        shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+        months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+        shortMonths: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+      });
+    }
   }
 
   // Set scales
@@ -241,6 +239,7 @@ class Chart {
 
   setup (data) {
     this.data = data;
+    this.setFormat();
     this.onResize();
     this.setScales();
     this.setAxis();
@@ -302,6 +301,14 @@ class Chart {
 
   // Getters
 
+  // Set data accesors
+  x (d) {
+    return d.date
+  }
+  y (d) {
+    return d.value
+  }
+
   // Setup axis renderers & formats
   axisRendererX () {
     return d3Axis.axisBottom(this.scaleX)
@@ -319,6 +326,17 @@ class Chart {
   }
   axisFormatY () {
     return d3Format.format('d')
+  }
+
+  // tooltip formats
+  tooltipFormatX () {
+    return d3TimeFormat.timeFormat((this.config.lang === 'es') ? '%d %B, %Y' : '%B %d, %Y')
+  } 
+  tooltipFormatY () {
+    return d3Format.format('$,.1f')
+  }
+  currencyFormat () {
+    return ['', '\u00a0€']
   }
 
   // Get scales
