@@ -157,12 +157,23 @@ class Chart {
     // Setup config object
     this.config = lodash.defaultsDeep(config, configDefaults);
     this.width = 0;
-    // Set formatDefaultLocale based on config.lang
+    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
     d3Format.formatDefaultLocale({
       decimal: (this.config.lang === 'es') ? ',' : '.',
       thousands: (this.config.lang === 'es') ? '.' : ',',
       currency: this.config.format.currency
     });
+    if (this.config.lang === 'es') {
+      d3TimeFormat.timeFormatDefaultLocale({
+        dateTime: '%A, %e de %B de %Y, %X',
+        date: '%d/%m/%Y',
+        time: '%H:%M:%S',
+        days: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+        shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+        months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+        shortMonths: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+      });
+    }
     // Set default formats after formatDefaultLocale defined
     this.config.format.x = d3TimeFormat.timeFormat('%B %d, %Y');
     this.config.format.y = d3Format.format('$,.1f');
