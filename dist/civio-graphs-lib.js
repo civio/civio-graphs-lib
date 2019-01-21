@@ -174,8 +174,8 @@ class Chart {
       });
     }
     // Set default formats after formatDefaultLocale defined
-    if (!this.config.format.x) this.config.format.x = (this.config.lang === 'es') ? d3TimeFormat.timeFormat('%d %B, %Y') : d3TimeFormat.timeFormat('%B %d, %Y');
-    if (!this.config.format.y) this.config.format.y = d3Format.format('$,.1f');
+    this.config.format.x = this.config.format.x | d3TimeFormat.timeFormat((this.config.lang === 'es') ? '%d %B, %Y' : '%B %d, %Y');
+    this.config.format.y = this.config.format.y | d3Format.format('$,.1f');
     // Set data accesors
     this.x = (d) => d.date;
     this.y = (d) => d.value;
