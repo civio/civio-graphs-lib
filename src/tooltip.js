@@ -67,10 +67,10 @@ export default function () {
   tooltip.setContent = function (x, y) {
     // Set label x value
     el.select('.label.x')
-      .html(chart.tooltipFormatX(x))
+      .html(chart.tooltipFormatX()(x))
     // Set label y value
     el.select('.label.y')
-      .html(chart.tooltipFormatY(y))
+      .html(chart.tooltipFormatY()(y))
   }
 
   tooltip.onMouseMove = function () {
