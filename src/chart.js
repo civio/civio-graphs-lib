@@ -4,7 +4,7 @@ import {format, formatDefaultLocale} from 'd3-format'
 import {scaleLinear, scaleTime} from 'd3-scale'
 import {select} from 'd3-selection'
 import {timeYear} from 'd3-time'
-import {timeFormat} from 'd3-time-format'
+import {timeFormat, timeFormatDefaultLocale} from 'd3-time-format'
 
 import {debounce, defaultsDeep} from 'lodash'
 
@@ -40,12 +40,23 @@ export default class Chart {
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
     this.width = 0
-    // Set formatDefaultLocale based on config.lang
+    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
     formatDefaultLocale({
       decimal: (this.config.lang === 'es') ? ',' : '.',
       thousands: (this.config.lang === 'es') ? '.' : ',',
       currency: this.config.format.currency
     })
+    if (this.config.lang === 'es') {
+      timeFormatDefaultLocale({
+        dateTime: '%A, %e de %B de %Y, %X',
+        date: '%d/%m/%Y',
+        time: '%H:%M:%S',
+        days: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+        shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+        months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
+        shortMonths: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+      })
+    }
     // Set default formats after formatDefaultLocale defined
     this.config.format.x = timeFormat('%B %d, %Y')
     this.config.format.y = format('$,.1f')
