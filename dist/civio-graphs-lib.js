@@ -147,6 +147,8 @@ class Chart {
   constructor (selector, config) {
     // Select chart container
     this.el = d3Selection.select(selector);
+    // Launch error if no selector found
+    if (!this.el.length) throw new Error(`Can't find root element width ${selector} selector`)
     // Setup config object
     this.config = lodash.defaultsDeep(config, configDefaults);
     this.width = 0;
