@@ -32,6 +32,8 @@ export default class Chart {
   constructor (selector, config) {
     // Select chart container
     this.el = select(selector)
+    // Launch error if no selector found
+    if (!this.el.length) console.error(`Can't find root element width ${selector} selector`)
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
     this.width = 0
