@@ -173,6 +173,7 @@ class Chart {
     d3Format.formatDefaultLocale({
       decimal: (this.config.lang === 'es') ? ',' : '.',
       thousands: (this.config.lang === 'es') ? '.' : ',',
+      grouping: [3],
       currency: this.currencyFormat()
     });
     if (this.config.lang === 'es') {
