@@ -1,9 +1,9 @@
 // civio-graphs-lib v0.1.3 Copyright 2019 Raúl Díaz Poblete
 (function (global, factory) {
-typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-selection'), require('d3-axis'), require('d3-format'), require('d3-scale'), require('d3-time'), require('d3-time-format'), require('lodash'), require('d3-shape')) :
-typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-selection', 'd3-axis', 'd3-format', 'd3-scale', 'd3-time', 'd3-time-format', 'lodash', 'd3-shape'], factory) :
-(factory((global['civio-graphs-lib'] = global['civio-graphs-lib'] || {}),global.d3Array,global.d3Selection,global.d3Axis,global.d3Format,global.d3Scale,global.d3Time,global.d3TimeFormat,global.lodash,global.d3Shape));
-}(this, (function (exports,d3Array,d3Selection,d3Axis,d3Format,d3Scale,d3Time,d3TimeFormat,lodash,d3Shape) { 'use strict';
+typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-array'), require('d3-selection'), require('d3-axis'), require('d3-format'), require('d3-scale'), require('d3-time'), require('d3-time-format'), require('lodash'), require('d3-shape'), require('d3-hierarchy'), require('d3-scale-chromatic')) :
+typeof define === 'function' && define.amd ? define(['exports', 'd3-array', 'd3-selection', 'd3-axis', 'd3-format', 'd3-scale', 'd3-time', 'd3-time-format', 'lodash', 'd3-shape', 'd3-hierarchy', 'd3-scale-chromatic'], factory) :
+(factory((global['civio-graphs-lib'] = global['civio-graphs-lib'] || {}),global.d3Array,global.d3Selection,global.d3Axis,global.d3Format,global.d3Scale,global.d3Time,global.d3TimeFormat,global.lodash,global.d3Shape,global.d3Hierarchy,global.d3ScaleChromatic));
+}(this, (function (exports,d3Array,d3Selection,d3Axis,d3Format,d3Scale,d3Time,d3TimeFormat,lodash,d3Shape,d3Hierarchy,d3ScaleChromatic) { 'use strict';
 
 function tooltip () {
   let el,
@@ -453,9 +453,125 @@ class AreaChart extends LineChart{
   }
 }
 
+class TreemapChart extends Chart {
+
+  // Override chart as html div
+  setChart () {
+    this.chart = this.el.append('div');
+    return this
+  }
+
+  // Override tooltip
+  setTooltip () {}
+
+  // Set scales
+  setScales () {
+    // treemap
+    this.treemap = d3Hierarchy.treemap()
+      .size([this.width, this.height])
+      .round(true);
+      // .padding(1)
+    // color scale
+    this.scaleColor = this.getScaleColor();
+    return this
+  }
+
+  // Override axis
+  setAxis () {
+    return this
+  }
+
+  // Render chart
+  render () {
+    this.setResize();
+    this.renderNodes();
+    return this
+  }
+
+  // Render treemap nodes
+  renderNodes () {
+    this.nodes = this.chart.selectAll('div')
+      .data(this.treemap(this.data).leaves())
+      .enter().append('div')
+      .attr('class', this.getNodeClass)
+      .style('background', (d) => this.getNodeColor(d))
+      .call(el => this.setNodeDimension(el))
+      .call(el => this.setNodeTooltip(el))
+      .append('span')
+        .html(this.getNodeTitle);
+  }
+
+  // Clear chart
+  clear () {
+    super.clear();
+    // Remove treemap groups
+    this.chart.selectAll('div').remove();
+    return this
+  }
+
+  // Resize chart
+  resize () {
+    // Update line path
+    if (this.treemap) {
+      this.treemap.size([this.width, this.height]);
+      this.clear();
+      this.renderNodes();
+    }
+    return this
+  }
+
+  // Set node
+  setNodeDimension (el) {
+    el.style('top', d => `${d.y0}px`)
+      .style('left', d => `${100*d.x0/this.width}%`)
+      .style('width', d => `${100*(d.x1-d.x0)/this.width}%`)
+      .style('height', d => `${(d.y1-d.y0)}px`);
+  }
+  setNodeTooltip (el) {
+    el.attr('data-toggle', 'tooltip')
+      .attr('data-html', 'true')
+      .attr('title', (d) => this.getNodeTooltipContent(d));
+  }
+
+  // Getters
+
+  // Override data accesors
+  x (d) {
+    return d.data.name
+  }
+  y (d) {
+    return d.data.value
+  }
+  // Set scale color
+  getScaleColor () {
+    return d3Scale.scaleOrdinal().range(d3ScaleChromatic.schemeCategory10)
+  }
+ 
+  getNodeClass () {
+    return 'treemap-node'
+  }
+  getNodeColor (d) {
+    while (d.depth > 1) d = d.parent;
+    return this.scaleColor(this.x(d))
+  }
+  getNodeTitle (d) {
+    return this.x(d)
+  }
+  getNodeTooltipContent (d) {
+    return `<strong>${this.x(d)}</strong><br/>${this.tooltipFormatY()(this.y(d))}`
+  }
+
+  // Set renderer curve
+  tile (type) {
+    this.treemap.tile(type);
+    return this
+  }
+}
+
 exports.Chart = Chart;
 exports.AreaChart = AreaChart;
 exports.LineChart = LineChart;
+exports.TreemapChart = TreemapChart;
 exports.tooltip = tooltip;
 
 Object.defineProperty(exports, '__esModule', { value: true });
