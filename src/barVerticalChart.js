@@ -13,7 +13,12 @@ export default class BarVerticalChart extends Chart {
   // Render chart
   render() {
     super.render()
-    // Render chart bars
+    this.renderBars()
+    return this
+  }
+
+  // Render chart bars
+  renderBars() {
     this.bars = this.chart
       .selectAll('rect')
       .data(this.data)
