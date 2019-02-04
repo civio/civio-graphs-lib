@@ -1,12 +1,12 @@
-import {extent} from 'd3-array'
-import {axisLeft, axisBottom} from 'd3-axis'
-import {format, formatDefaultLocale} from 'd3-format'
-import {scaleLinear, scaleTime} from 'd3-scale'
-import {select} from 'd3-selection'
-import {timeYear} from 'd3-time'
-import {timeFormat, timeFormatDefaultLocale} from 'd3-time-format'
+import { extent } from 'd3-array'
+import { axisLeft, axisBottom } from 'd3-axis'
+import { format, formatDefaultLocale } from 'd3-format'
+import { scaleLinear, scaleTime } from 'd3-scale'
+import { select } from 'd3-selection'
+import { timeYear } from 'd3-time'
+import { timeFormat, timeFormatDefaultLocale } from 'd3-time-format'
 
-import {debounce, defaultsDeep} from 'lodash'
+import { debounce, defaultsDeep } from 'lodash'
 
 import tooltip from './tooltip'
 
@@ -19,7 +19,7 @@ const configDefaults = {
     top: 0,
     right: 0,
     left: 0,
-    bottom: 0,
+    bottom: 0
   },
   axis: {
     x: true,
@@ -28,12 +28,12 @@ const configDefaults = {
 }
 
 export default class Chart {
-
-  constructor (selector, config) {
+  constructor(selector, config) {
     // Select chart container
     this.el = select(selector)
     // Launch error if no selector found
-    if (this.el.size() === 0) throw new Error(`Can't find root element ${selector}`)
+    if (this.el.size() === 0)
+      throw new Error(`Can't find root element ${selector}`)
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
     this.width = 0
@@ -42,22 +42,21 @@ export default class Chart {
     this.setTooltip()
   }
 
-  setChart () {
+  setChart() {
     this.chart = this.el.append('svg')
     return this
   }
 
-  setTooltip () {
-    this.tooltip = tooltip()
-      .setup(this)
+  setTooltip() {
+    this.tooltip = tooltip().setup(this)
   }
 
   // Set formats
-  setFormat () {
+  setFormat() {
     // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
     formatDefaultLocale({
-      decimal: (this.config.lang === 'es') ? ',' : '.',
-      thousands: (this.config.lang === 'es') ? '.' : ',',
+      decimal: this.config.lang === 'es' ? ',' : '.',
+      thousands: this.config.lang === 'es' ? '.' : ',',
       grouping: [3],
       currency: this.currencyFormat()
     })
@@ -67,60 +66,113 @@ export default class Chart {
         date: '%d/%m/%Y',
         time: '%H:%M:%S',
         periods: ['AM', 'PM'],
-        days: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
+        days: [
+          'domingo',
+          'lunes',
+          'martes',
+          'miércoles',
+          'jueves',
+          'viernes',
+          'sábado'
+        ],
         shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-        months: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-        shortMonths: ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
+        months: [
+          'enero',
+          'febrero',
+          'marzo',
+          'abril',
+          'mayo',
+          'junio',
+          'julio',
+          'agosto',
+          'septiembre',
+          'octubre',
+          'noviembre',
+          'diciembre'
+        ],
+        shortMonths: [
+          'ene',
+          'feb',
+          'mar',
+          'abr',
+          'may',
+          'jun',
+          'jul',
+          'ago',
+          'sep',
+          'oct',
+          'nov',
+          'dic'
+        ]
       })
     }
   }
 
   // Set scales
-  setScales () {
+  setScales() {
     // setup x scale
     this.scaleX = this.getScaleX()
       .domain(this.scaleXDomain())
       .range(this.scaleXRange())
     // setup y scale
     this.scaleY = this.getScaleY()
-      .domain(this.scaleYDomain()).nice()
+      .domain(this.scaleYDomain())
+      .nice()
       .range(this.scaleYRange())
     return this
   }
 
   // Set axis
-  setAxis () {
+  setAxis() {
     // Set x axis
     if (this.config.axis.x) {
-      this.axisX = g => g
-        .attr('class', 'x axis')
-        .attr('transform', `translate(0,${this.height - this.config.margin.bottom})`)
-        .call(this.axisRendererX())
-        .call(g => g.selectAll('.tick line')
-          .attr('y1', -this.height + this.config.margin.top + this.config.margin.bottom)
-          .attr('y2', 0)
-        )
+      this.axisX = g =>
+        g
+          .attr('class', 'x axis')
+          .attr(
+            'transform',
+            `translate(0,${this.height - this.config.margin.bottom})`
+          )
+          .call(this.axisRendererX())
+          .call(g =>
+            g
+              .selectAll('.tick line')
+              .attr(
+                'y1',
+                -this.height +
+                  this.config.margin.top +
+                  this.config.margin.bottom
+              )
+              .attr('y2', 0)
+          )
     }
     // Set y axis
     if (this.config.axis.y) {
-      this.axisY = g => g
-        .attr('class', 'y axis')
-        .attr('transform', `translate(${this.config.margin.left},0)`)
-        .call(this.axisRendererY())
-        .call(g => g.selectAll('.tick line')
-          .attr('x1', 0)
-          .attr('x2', this.width - this.config.margin.left - this.config.margin.right)
-        )
+      this.axisY = g =>
+        g
+          .attr('class', 'y axis')
+          .attr('transform', `translate(${this.config.margin.left},0)`)
+          .call(this.axisRendererY())
+          .call(g =>
+            g
+              .selectAll('.tick line')
+              .attr('x1', 0)
+              .attr(
+                'x2',
+                this.width - this.config.margin.left - this.config.margin.right
+              )
+          )
     }
     return this
   }
 
   // Set chart renderer (line, area...)
-  setRenderer () {
+  setRenderer() {
     return this
   }
 
-  setup (data) {
+  setup(data) {
+    console.log(data)
     this.data = data
     this.setFormat()
     this.onResize()
@@ -131,14 +183,12 @@ export default class Chart {
   }
 
   // Render chart based on data
-  render () {
+  render() {
     if (this.config.axis.x) {
-      this.chart.append('g')
-        .call(this.axisX)
+      this.chart.append('g').call(this.axisX)
     }
     if (this.config.axis.y) {
-      this.chart.append('g')
-        .call(this.axisY)
+      this.chart.append('g').call(this.axisY)
     }
     this.tooltip.render()
     this.setResize()
@@ -146,33 +196,34 @@ export default class Chart {
   }
 
   // Clear chart
-  clear () {
-    if (this.config.axis.x || this.config.axis.y) this.chart.selectAll('g').remove()
+  clear() {
+    if (this.config.axis.x || this.config.axis.y)
+      this.chart.selectAll('g').remove()
   }
 
   // Set resize event listener
-  setResize () {
+  setResize() {
     window.addEventListener('resize', debounce(() => this.onResize(), 150))
     return this
   }
 
   // Resize event handler
-  onResize () {
+  onResize() {
     let currentWidth = this.el.node().offsetWidth
     if (currentWidth !== this.width) {
       this.width = currentWidth
       // force height if defined in config, otherwise use aspectRatio
-      this.height = (this.config.height) ? this.config.height : Math.round(this.width / this.config.aspectRatio)
+      this.height = this.config.height
+        ? this.config.height
+        : Math.round(this.width / this.config.aspectRatio)
       this.resize()
     }
   }
 
   // Resize chart
-  resize () {
+  resize() {
     // Resize chart
-    this.chart
-      .attr('width', this.width)
-      .attr('height', this.height)
+    this.chart.attr('width', this.width).attr('height', this.height)
     // Resize scales range
     if (this.scaleX) this.scaleX.range(this.scaleXRange())
     if (this.scaleY) this.scaleY.range(this.scaleYRange())
@@ -185,64 +236,64 @@ export default class Chart {
   // Getters
 
   // Set data accesors
-  x (d) {
+  x(d) {
     return d.date
   }
-  y (d) {
+  y(d) {
     return d.value
   }
 
   // Setup axis renderers & formats
-  axisRendererX () {
+  axisRendererX() {
     return axisBottom(this.scaleX)
       .tickSizeOuter(0)
       .tickFormat(this.axisFormatX())
       .ticks(timeYear)
   }
-  axisRendererY () {
+  axisRendererY() {
     return axisLeft(this.scaleY)
       .tickFormat(this.axisFormatY())
       .ticks(this.height / 80)
   }
-  axisFormatX () {
+  axisFormatX() {
     return timeFormat('%Y')
   }
-  axisFormatY () {
+  axisFormatY() {
     return format('d')
   }
 
   // tooltip formats
-  tooltipFormatX () {
-    return timeFormat((this.config.lang === 'es') ? '%d %B, %Y' : '%B %d, %Y')
-  } 
-  tooltipFormatY () {
+  tooltipFormatX() {
+    return timeFormat(this.config.lang === 'es' ? '%d %B, %Y' : '%B %d, %Y')
+  }
+  tooltipFormatY() {
     return format('$,.1f')
   }
-  currencyFormat () {
+  currencyFormat() {
     return ['', '\u00a0€']
   }
 
   // Get scales
-  getScaleX () {
+  getScaleX() {
     return scaleTime()
   }
-  getScaleY () {
+  getScaleY() {
     return scaleLinear()
   }
 
   // Get scale domains
-  scaleXDomain () {
-    return [this.x(this.data[0]), this.x(this.data[this.data.length-1])]
+  scaleXDomain() {
+    return [this.x(this.data[0]), this.x(this.data[this.data.length - 1])]
   }
-  scaleYDomain () {
+  scaleYDomain() {
     return extent(this.data, this.y)
   }
 
   // Get scale ranges
-  scaleXRange () {
+  scaleXRange() {
     return [this.config.margin.left, this.width - this.config.margin.right]
   }
-  scaleYRange () {
+  scaleYRange() {
     return [this.height - this.config.margin.bottom, this.config.margin.top]
   }
 }
