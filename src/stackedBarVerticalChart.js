@@ -50,7 +50,7 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
       .enter()
       .append('g')
       .attr('fill', (d, i) => this.scaleColor(this.data.keys[i]))
-      .attr('class', d => `bar-stack bar-${slugify(d.key.toLowerCase())}`)
+      .attr('class', this.barClass.bind(this))
       .selectAll('.bar-stack-item')
       .data(d => d)
       .enter()
@@ -75,6 +75,11 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
 
   scaleYDomain() {
     return [0, max(this.data, d => max(d, e => max(e)))]
+  }
+
+  // Get bar class
+  barClass(d) {
+    return `bar-stack bar-${slugify(d.key.toLowerCase())}`
   }
 
   // Set scale color for keys
