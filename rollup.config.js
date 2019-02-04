@@ -1,8 +1,8 @@
-import {terser} from "rollup-plugin-terser";
-import * as meta from "./package.json";
+import { terser } from 'rollup-plugin-terser'
+import * as meta from './package.json'
 
 const config = {
-  input: 'src/index.js',
+  input: 'src/js/index.js',
   external: Object.keys(meta.dependencies || {}),
   output: {
     file: `dist/${meta.name}.js`,
@@ -10,11 +10,13 @@ const config = {
     format: 'umd',
     indent: false,
     extend: true,
-    banner: `// ${meta.name} v${meta.version} Copyright ${(new Date).getFullYear()} ${meta.author.name}`,
+    banner: `// ${meta.name} v${
+      meta.version
+    } Copyright ${new Date().getFullYear()} ${meta.author.name}`,
     globals: Object.assign({}, ...Object.keys(meta.dependencies || {})) //.filter(key => /^d3-/.test(key)).map(key => ({[key]: 'd3'})))
   },
   plugins: []
-};
+}
 
 export default [
   config,
@@ -33,4 +35,4 @@ export default [
       })
     ]
   }
-];
+]

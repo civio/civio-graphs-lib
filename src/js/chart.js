@@ -174,7 +174,6 @@ export default class Chart {
   }
 
   setup(data) {
-    console.log(data)
     this.data = data
     this.setFormat()
     this.onResize()
