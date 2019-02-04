@@ -43,16 +43,18 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
 
   // Render chart bars
   renderBars() {
+    // add stacked bars
     this.bars = this.chart
-      .append('g')
-      .selectAll('g')
+      .selectAll('.bar-stack')
       .data(this.data)
-      .join('g')
+      .enter()
+      .append('g')
       .attr('fill', (d, i) => this.scaleColor(this.data.keys[i]))
       .attr('class', d => `bar-stack bar-${slugify(d.key.toLowerCase())}`)
-      .selectAll('rect')
+      .selectAll('.bar-stack-item')
       .data(d => d)
-      .join('rect')
+      .enter()
+      .append('rect')
       .attr('class', 'bar-stack-item')
       .call(this.setBarDimensions.bind(this))
     return this
