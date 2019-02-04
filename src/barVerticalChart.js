@@ -1,8 +1,16 @@
 import { scaleBand, scaleQuantize } from 'd3-scale'
 
+import slugify from 'slugify'
+
 import Chart from './chart'
+import Tooltip from './tooltip'
 
 export default class BarVerticalChart extends Chart {
+  setTooltip() {
+    this.tooltip = new Tooltip(this, {
+      align: false
+    })
+  }
   // Set scales
   setScales() {
     super.setScales()
@@ -30,7 +38,7 @@ export default class BarVerticalChart extends Chart {
       .data(this.data)
       .enter()
       .append('rect')
-      .attr('class', 'bar')
+      .attr('class', this.barClass.bind(this))
       .call(this.setBarDimensions.bind(this))
     return this
   }
@@ -82,6 +90,15 @@ export default class BarVerticalChart extends Chart {
   // Get scale domains
   scaleXDomain() {
     return this.data.map(this.x)
+  }
+
+  // Get bar class
+  barClass(d) {
+    return `bar bar-${slugify(
+      this.x(d)
+        .toString()
+        .toLowerCase()
+    )}`
   }
 
   // Set scaleX padding
