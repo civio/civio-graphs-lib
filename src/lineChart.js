@@ -1,8 +1,12 @@
-import {line} from 'd3-shape'
+import { line } from 'd3-shape'
 
 import Chart from './chart'
+import Tooltip from './tooltip'
 
-export default class LineChart extends Chart{
+export default class LineChart extends Chart {
+  setTooltip() {
+    this.tooltip = new Tooltip(this, { point: true })
+  }
 
   // Setup line renderer
   setRenderer() {
@@ -14,10 +18,11 @@ export default class LineChart extends Chart{
   }
 
   // Render chart
-  render () {
+  render() {
     super.render()
     // Render chart line
-    this.line = this.chart.append('path')
+    this.line = this.chart
+      .append('path')
       .datum(this.data)
       .attr('class', 'line')
       .attr('d', this.lineRenderer)
@@ -25,7 +30,7 @@ export default class LineChart extends Chart{
   }
 
   // Clear chart
-  clear () {
+  clear() {
     super.clear()
     // Remove paths
     this.chart.selectAll('path').remove()
@@ -33,7 +38,7 @@ export default class LineChart extends Chart{
   }
 
   // Resize chart
-  resize () {
+  resize() {
     super.resize()
     // Update line path
     if (this.line) this.line.attr('d', this.lineRenderer)
@@ -41,7 +46,7 @@ export default class LineChart extends Chart{
   }
 
   // Set renderer curve
-  curve (type) {
+  curve(type) {
     this.lineRenderer.curve(type)
     return this
   }
