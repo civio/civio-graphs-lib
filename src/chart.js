@@ -8,7 +8,7 @@ import { timeFormat, timeFormatDefaultLocale } from 'd3-time-format'
 
 import { debounce, defaultsDeep } from 'lodash'
 
-import tooltip from './tooltip'
+import Tooltip from './tooltip'
 
 const configDefaults = {
   // we can define an aspectRatio to calculate height or define a fixed height
@@ -48,7 +48,7 @@ export default class Chart {
   }
 
   setTooltip() {
-    this.tooltip = tooltip().setup(this)
+    this.tooltip = new Tooltip(this)
   }
 
   // Set formats
