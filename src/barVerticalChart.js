@@ -1,4 +1,4 @@
-import { scaleBand } from 'd3-scale'
+import { scaleBand, scaleQuantize } from 'd3-scale'
 
 import Chart from './chart'
 
@@ -7,6 +7,12 @@ export default class BarVerticalChart extends Chart {
   setScales() {
     super.setScales()
     this.scaleX.padding(this.scaleXPadding())
+    // custom invert function for scaleBand
+    // https://bl.ocks.org/shimizu/808e0f5cadb6a63f28bb00082dc8fe3f
+    this.scaleXInvert = scaleQuantize()
+      .domain(this.scaleX.range())
+      .range(this.scaleX.domain())
+    this.scaleX.invert = x => this.scaleXInvert(x)
     return this
   }
 
@@ -51,6 +57,8 @@ export default class BarVerticalChart extends Chart {
   // Resize chart
   resize() {
     super.resize()
+    // update scaleXInvert domain
+    if (this.scaleXInvert) this.scaleXInvert.domain(this.scaleX.range())
     // Update line path
     if (this.bars) this.bars.call(this.setBarDimensions.bind(this))
     return this
@@ -59,6 +67,11 @@ export default class BarVerticalChart extends Chart {
   // Clear axis x format
   axisFormatX() {
     return null
+  }
+
+  // tooltip formats
+  tooltipFormatX() {
+    return d => d
   }
 
   // Get scales
