@@ -68,6 +68,11 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
       .attr('width', this.scaleX.bandwidth())
   }
 
+  // Root element class
+  chartClass() {
+    return 'chart chart-stacked-bar-vertical'
+  }
+
   // Get scale domains
   scaleXDomain() {
     return this.data.values

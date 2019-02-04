@@ -5,7 +5,9 @@ import Tooltip from './tooltip'
 
 export default class LineChart extends Chart {
   setTooltip() {
-    this.tooltip = new Tooltip(this, { point: true })
+    this.tooltip = new Tooltip(this, {
+      point: true
+    })
   }
 
   // Setup line renderer
@@ -43,6 +45,11 @@ export default class LineChart extends Chart {
     // Update line path
     if (this.line) this.line.attr('d', this.lineRenderer)
     return this
+  }
+
+  // Root element class
+  chartClass() {
+    return 'chart chart-line'
   }
 
   // Set renderer curve

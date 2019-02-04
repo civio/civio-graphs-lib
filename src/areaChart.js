@@ -1,9 +1,8 @@
-import {area} from 'd3-shape'
+import { area } from 'd3-shape'
 
 import LineChart from './lineChart'
 
-export default class AreaChart extends LineChart{
-
+export default class AreaChart extends LineChart {
   // Setup line & area
   setRenderer() {
     super.setRenderer()
@@ -19,7 +18,8 @@ export default class AreaChart extends LineChart{
   render() {
     super.render()
     // Render chart area
-    this.area = this.chart.append('path')
+    this.area = this.chart
+      .append('path')
       .datum(this.data)
       .attr('class', 'area')
       .attr('d', this.areaRenderer)
@@ -29,22 +29,27 @@ export default class AreaChart extends LineChart{
   // resize chart
   resize() {
     super.resize()
-    // Resize area renderer  
+    // Resize area renderer
     if (this.areaRenderer) this.areaRenderer.y0(this.getAreaRendererY0())
     // Uupdate area path
     if (this.area) this.area.attr('d', this.areaRenderer)
     return this
   }
 
+  // Root element class
+  chartClass() {
+    return 'chart chart-area'
+  }
+
   // Set renderer curve
-  curve (type) {
+  curve(type) {
     super.curve(type)
     this.areaRenderer.curve(type)
     return this
   }
 
   // get areaRenderer y0
-  getAreaRendererY0 () {
+  getAreaRendererY0() {
     return this.height - this.config.margin.bottom
   }
 }

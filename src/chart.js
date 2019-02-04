@@ -34,6 +34,8 @@ export default class Chart {
     // Launch error if no selector found
     if (this.el.size() === 0)
       throw new Error(`Can't find root element ${selector}`)
+    // Set element class
+    this.el.attr('class', this.chartClass())
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
     this.width = 0
@@ -233,7 +235,12 @@ export default class Chart {
     return this
   }
 
-  // Getters
+  // Getters/Setters
+
+  // Root element class
+  chartClass() {
+    return 'chart'
+  }
 
   // Set data accesors
   x(d) {

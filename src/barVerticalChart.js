@@ -72,6 +72,11 @@ export default class BarVerticalChart extends Chart {
     return this
   }
 
+  // Root element class
+  chartClass() {
+    return 'chart chart-bar-vertical'
+  }
+
   // Clear axis x format
   axisFormatX() {
     return null
