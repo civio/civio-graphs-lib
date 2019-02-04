@@ -69,6 +69,8 @@ export default class TreemapChart extends Chart {
       this.clear()
       this.renderNodes()
     }
+    // Update chart height
+    this.chart.style('height', `${this.height}px`)
     return this
   }
 
