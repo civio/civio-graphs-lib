@@ -1,4 +1,4 @@
-import { extent } from 'd3-array'
+import { bisector, extent } from 'd3-array'
 import { axisLeft, axisBottom } from 'd3-axis'
 import { format, formatDefaultLocale } from 'd3-format'
 import { scaleLinear, scaleTime } from 'd3-scale'
@@ -121,6 +121,8 @@ export default class Chart {
       .domain(this.scaleYDomain())
       .nice()
       .range(this.scaleYRange())
+    // bisector for tooltip data & position
+    this.bisector = bisector(this.x).left
     return this
   }
 
@@ -301,5 +303,28 @@ export default class Chart {
   }
   scaleYRange() {
     return [this.height - this.config.margin.bottom, this.config.margin.top]
+  }
+
+  // Tooltip data for a mouse position
+  getMouseData(x) {
+    // get mouse position
+    const mouseX = this.scaleX.invert(x)
+    // calculate current data
+    const i = this.bisector(this.data, mouseX, 1)
+    const d0 = this.data[i - 1]
+    const d1 = this.data[i]
+    return d1 && mouseX - this.x(d0) > this.x(d1) - mouseX ? d1 : d0
+  }
+
+  // Tooltip position for a given data
+  getDataPosition(data) {
+    // get data position for current date
+    const i = this.bisector(this.data, this.x(data))
+    const d =
+      i < this.data.length ? this.data[i] : this.data[this.data.length - 1]
+    return {
+      x: this.scaleX(this.x(d)),
+      y: this.scaleY(this.y(d))
+    }
   }
 }

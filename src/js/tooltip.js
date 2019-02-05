@@ -1,4 +1,3 @@
-import { bisector } from 'd3-array'
 import { event } from 'd3-selection'
 
 import { defaults } from 'lodash'
@@ -15,29 +14,27 @@ export default class Tooltip {
     this.chart = _chart
     // get tooltip element from chart container
     this.el = this.chart.el.select('.tooltip')
+    if (this.el.empty()) return null
     // Setup config object
     this.config = defaults(config, configDefaults)
-    return this
   }
 
   render() {
-    // Skip if there is no tooltip element
-    if (!this.el || this.el.empty()) return this
-    // Setup bisectDate for mouse move
-    this.bisectDate = bisector(this.chart.x).left
-    // Setup chart point
-    if (this.config.point) {
-      this.point = this.chart.chart
-        .append('circle')
-        .attr('class', 'tooltip-point')
-        .attr('display', 'none')
-        .attr('r', 4)
+    if (!this.el.empty()) {
+      // Setup chart point
+      if (this.config.point) {
+        this.point = this.chart.chart
+          .append('circle')
+          .attr('class', 'tooltip-point')
+          .attr('display', 'none')
+          .attr('r', 4)
+      }
+      // Set mouse events
+      this.chart.chart
+        .on('mousemove', this.onMouseMove.bind(this))
+        .on('mouseenter', this.onMouseEnter.bind(this))
+        .on('mouseleave', this.onMouseLeave.bind(this))
     }
-    // Set mouse events
-    this.chart.chart
-      .on('mousemove', this.onMouseMove.bind(this))
-      .on('mouseenter', this.onMouseEnter.bind(this))
-      .on('mouseleave', this.onMouseLeave.bind(this))
     return this
   }
 
@@ -56,7 +53,7 @@ export default class Tooltip {
   }
 
   setPosition(dataX) {
-    const { x, y } = this.getPosition(dataX)
+    const { x, y } = this.chart.getDataPosition(dataX)
     // set point position
     if (this.point) this.point.attr('transform', `translate(${x}, ${y})`)
     // set tooltip position
@@ -82,7 +79,7 @@ export default class Tooltip {
 
   onMouseMove() {
     // get current data by mouse position
-    const d = this.getMouseData(event.layerX)
+    const d = this.chart.getMouseData(event.layerX)
     if (this.currentData !== d) {
       this.currentData = d
       // set tooltip position
@@ -106,28 +103,5 @@ export default class Tooltip {
     // hide tooltip element & point
     this.hide()
     return this
-  }
-
-  getPosition(data) {
-    // get data position for current date
-    const i = this.bisectDate(this.chart.data, this.chart.x(data))
-    const d =
-      i < this.chart.data.length
-        ? this.chart.data[i]
-        : this.chart.data[this.chart.data.length - 1]
-    return {
-      x: this.chart.scaleX(this.chart.x(d)),
-      y: this.chart.scaleY(this.chart.y(d))
-    }
-  }
-
-  getMouseData(x) {
-    // get mouse position
-    const mouseX = this.chart.scaleX.invert(x)
-    // calculate current data
-    const i = this.bisectDate(this.chart.data, mouseX, 1)
-    const d0 = this.chart.data[i - 1]
-    const d1 = this.chart.data[i]
-    return d1 && mouseX - this.chart.x(d0) > this.chart.x(d1) - mouseX ? d1 : d0
   }
 }
