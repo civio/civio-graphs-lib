@@ -12,7 +12,7 @@ import Tooltip from './tooltip'
 
 const configDefaults = {
   // we can define an aspectRatio to calculate height or define a fixed height
-  aspectRatio: 16 / 9,
+  aspectRatio: 2,
   height: null,
   lang: 'es',
   margin: {
