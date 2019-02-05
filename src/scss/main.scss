@@ -1,4 +1,14 @@
+// Text color
 $color-text: #212529;
+
+// Projects colors
+$color-boe: #2078ff;
+$color-indultometro: #875cc3;
+$color-eell: #ffb114;
+$color-medicamentalia: #08a6bf;
+$color-qclo: #ff7550;
+$color-qm: #18dfa1;
+$color-tdas: #d3514a;
 
 html,
 body {
@@ -6,6 +16,8 @@ body {
   width: 100%;
   margin: 0;
 }
+
+// Common chart styles
 
 .chart {
   position: relative;
@@ -128,12 +140,40 @@ body {
   }
 }
 
+// Chart color by project
+
+.elboenuestrodecadadia .chart {
+  color: $color-boe;
+}
+.elindultometro .chart {
+  color: $color-indultometro;
+}
+.espanaenllamas .chart {
+  color: $color-eell;
+}
+.medicamentalia .chart {
+  color: $color-medicamentalia;
+}
+.quiencobralaobra .chart {
+  color: $color-qclo;
+}
+.quienmanda .chart {
+  color: $color-qm;
+}
+.tuderechoasaber .chart {
+  color: $color-tdas;
+}
+
+// Chart line & area styles
+
 .chart-line,
 .chart-area {
   .tooltip .y.label {
     font-weight: 600;
   }
 }
+
+// Chart bar vertical styles
 
 .chart-bar-vertical {
   .tooltip {
