@@ -24,7 +24,8 @@ const configDefaults = {
   axis: {
     x: true,
     y: true
-  }
+  },
+  tooltip: true
 }
 
 export default class Chart {
@@ -39,9 +40,8 @@ export default class Chart {
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
     this.width = 0
-    // Set chart & tooltip
+    // Set chart
     this.setChart()
-    this.setTooltip()
   }
 
   setChart() {
@@ -49,8 +49,19 @@ export default class Chart {
     return this
   }
 
-  setTooltip() {
-    this.tooltip = new Tooltip(this)
+  setup(data) {
+    this.setData(data)
+    this.setFormat()
+    this.onResize()
+    this.setScales()
+    this.setAxis()
+    this.setRenderer()
+    if (this.config.tooltip) this.setTooltip()
+    return this
+  }
+
+  setData(data) {
+    this.data = data
   }
 
   // Set formats
@@ -175,14 +186,8 @@ export default class Chart {
     return this
   }
 
-  setup(data) {
-    this.data = data
-    this.setFormat()
-    this.onResize()
-    this.setScales()
-    this.setAxis()
-    this.setRenderer()
-    return this
+  setTooltip() {
+    this.tooltip = new Tooltip(this)
   }
 
   // Render chart based on data
@@ -193,7 +198,7 @@ export default class Chart {
     if (this.config.axis.y) {
       this.chart.append('g').call(this.axisY)
     }
-    this.tooltip.render()
+    if (this.tooltip) this.tooltip.render()
     this.setResize()
     return this
   }
@@ -275,7 +280,7 @@ export default class Chart {
     return timeFormat(this.config.lang === 'es' ? '%d %B, %Y' : '%B %d, %Y')
   }
   tooltipFormatY() {
-    return format('$,.1f')
+    return format('$,d')
   }
   currencyFormat() {
     return ['', '\u00a0€']

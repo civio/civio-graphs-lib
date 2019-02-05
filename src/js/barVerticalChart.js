@@ -6,11 +6,6 @@ import Chart from './chart'
 import Tooltip from './tooltip'
 
 export default class BarVerticalChart extends Chart {
-  setTooltip() {
-    this.tooltip = new Tooltip(this, {
-      align: false
-    })
-  }
   // Set scales
   setScales() {
     super.setScales()
@@ -22,6 +17,12 @@ export default class BarVerticalChart extends Chart {
       .range(this.scaleX.domain())
     this.scaleX.invert = x => this.scaleXInvert(x)
     return this
+  }
+
+  setTooltip() {
+    this.tooltip = new Tooltip(this, {
+      align: false
+    })
   }
 
   // Render chart

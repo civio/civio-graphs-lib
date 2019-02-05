@@ -4,12 +4,6 @@ import Chart from './chart'
 import Tooltip from './tooltip'
 
 export default class LineChart extends Chart {
-  setTooltip() {
-    this.tooltip = new Tooltip(this, {
-      point: true
-    })
-  }
-
   // Setup line renderer
   setRenderer() {
     this.lineRenderer = line()
@@ -17,6 +11,12 @@ export default class LineChart extends Chart {
       .x(d => this.scaleX(this.x(d)))
       .y(d => this.scaleY(this.y(d)))
     return this
+  }
+
+  setTooltip() {
+    this.tooltip = new Tooltip(this, {
+      point: true
+    })
   }
 
   // Render chart

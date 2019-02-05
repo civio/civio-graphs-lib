@@ -3,7 +3,6 @@ import { event } from 'd3-selection'
 import { defaults } from 'lodash'
 
 const configDefaults = {
-  // we can define an aspectRatio to calculate height or define a fixed height
   point: false,
   align: true,
   background: false
@@ -12,29 +11,35 @@ const configDefaults = {
 export default class Tooltip {
   constructor(_chart, config) {
     this.chart = _chart
-    // get tooltip element from chart container
-    this.el = this.chart.el.select('.tooltip')
-    if (this.el.empty()) return null
     // Setup config object
     this.config = defaults(config, configDefaults)
+    // Setup tooltip markup
+    this.setup()
+  }
+
+  setup() {
+    // append tooltip element to chart container
+    this.el = this.chart.el.append('div').attr('class', 'tooltip')
+    // append labels to tooltip element
+    this.el.append('div').attr('class', 'label x')
+    this.el.append('div').attr('class', 'label y')
+    return this
   }
 
   render() {
-    if (!this.el.empty()) {
-      // Setup chart point
-      if (this.config.point) {
-        this.point = this.chart.chart
-          .append('circle')
-          .attr('class', 'tooltip-point')
-          .attr('display', 'none')
-          .attr('r', 4)
-      }
-      // Set mouse events
-      this.chart.chart
-        .on('mousemove', this.onMouseMove.bind(this))
-        .on('mouseenter', this.onMouseEnter.bind(this))
-        .on('mouseleave', this.onMouseLeave.bind(this))
+    // Setup chart point
+    if (this.config.point) {
+      this.point = this.chart.chart
+        .append('circle')
+        .attr('class', 'tooltip-point')
+        .attr('display', 'none')
+        .attr('r', 4)
     }
+    // Set mouse events
+    this.chart.chart
+      .on('mousemove', this.onMouseMove.bind(this))
+      .on('mouseenter', this.onMouseEnter.bind(this))
+      .on('mouseleave', this.onMouseLeave.bind(this))
     return this
   }
 
@@ -71,14 +76,15 @@ export default class Tooltip {
   }
 
   setContent(data) {
-    // Set label x value
-    this.el
-      .select('.label.x')
-      .html(this.chart.tooltipFormatX()(this.chart.x(data)))
-    // Set label y value
-    this.el
-      .select('.label.y')
-      .html(this.chart.tooltipFormatY()(this.chart.y(data)))
+    // Set x & y labels
+    this.setLabel('x', this.chart.tooltipFormatX()(this.chart.x(data)))
+    this.setLabel('y', this.chart.tooltipFormatY()(this.chart.y(data)))
+    return this
+  }
+
+  setLabel(selector, data) {
+    this.el.select(`.label.${selector}`).html(data)
+    return this
   }
 
   onMouseMove() {
