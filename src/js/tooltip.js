@@ -70,11 +70,15 @@ export default class Tooltip {
     return this
   }
 
-  setContent(x, y) {
+  setContent(data) {
     // Set label x value
-    this.el.select('.label.x').html(this.chart.tooltipFormatX()(x))
+    this.el
+      .select('.label.x')
+      .html(this.chart.tooltipFormatX()(this.chart.x(data)))
     // Set label y value
-    this.el.select('.label.y').html(this.chart.tooltipFormatY()(y))
+    this.el
+      .select('.label.y')
+      .html(this.chart.tooltipFormatY()(this.chart.y(data)))
   }
 
   onMouseMove() {
@@ -84,11 +88,8 @@ export default class Tooltip {
       this.currentData = d
       // set tooltip position
       this.setPosition(this.currentData)
-      // set tooltip label
-      this.setContent(
-        this.chart.x(this.currentData),
-        this.chart.y(this.currentData)
-      )
+      // set tooltip content
+      this.setContent(this.currentData)
     }
     return this
   }
