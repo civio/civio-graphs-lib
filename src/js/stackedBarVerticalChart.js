@@ -1,4 +1,4 @@
-import { max } from 'd3-array'
+import { sum, max } from 'd3-array'
 import { quantize } from 'd3-interpolate'
 import { scaleOrdinal } from 'd3-scale'
 import { interpolateSpectral } from 'd3-scale-chromatic'
@@ -7,8 +7,15 @@ import { stack, stackOrderNone, stackOffsetNone } from 'd3-shape'
 import slugify from 'slugify'
 
 import BarVerticalChart from './barVerticalChart'
+import TooltipStacked from './tooltipStacked'
 
 export default class StackedBarVerticalChart extends BarVerticalChart {
+  setup(data, key) {
+    this.key = key
+    super.setup(data)
+    return this
+  }
+
   // Set scales
   setScales() {
     super.setScales()
@@ -20,25 +27,20 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
     return this
   }
 
-  setup(data, key) {
-    this.data = this.getDataStack(data, key)
-    this.setFormat()
-    this.onResize()
-    this.setScales()
-    this.setAxis()
-    this.setRenderer()
-    return this
+  setTooltip() {
+    this.tooltip = new TooltipStacked(this, {
+      align: false
+    })
   }
 
-  getDataStack(data, key) {
-    const keys = Object.keys(data[0]).filter(d => d !== key)
-    const dataStacked = stack()
+  setData(data) {
+    const keys = Object.keys(data[0]).filter(d => d !== this.key)
+    this.data = stack()
       .keys(keys)
       .order(stackOrderNone)
       .offset(stackOffsetNone)(data)
-    dataStacked.keys = keys
-    dataStacked.values = data.map(d => d[key])
-    return dataStacked
+    this.data.keys = keys
+    this.data.values = data.map(d => d[this.key])
   }
 
   // Render chart bars
@@ -80,6 +82,27 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
 
   scaleYDomain() {
     return [0, max(this.data, d => max(d, e => max(e)))]
+  }
+
+  // Tooltip data for a mouse position
+  getMouseData(x) {
+    // get mouse position
+    const mouseX = this.scaleX.invert(x)
+    // get x index from data values
+    const i = this.data.values.indexOf(mouseX)
+    // get data for current index
+    return this.data[0][i].data
+  }
+
+  // Tooltip position for a given data
+  getDataPosition(data) {
+    // get sum of current data keys
+    const y = sum(this.data.keys, key => +data[key])
+    // get data position for current data
+    return {
+      x: this.scaleX(data[this.key]),
+      y: this.scaleY(y)
+    }
   }
 
   // Get bar class
