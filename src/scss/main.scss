@@ -180,5 +180,9 @@ body {
     padding: 0;
     text-shadow: none;
     margin-top: -1.5em;
+
+    .x.label {
+      display: none;
+    }
   }
 }
