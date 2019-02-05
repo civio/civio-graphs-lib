@@ -46,11 +46,12 @@ export default class TreemapChart extends Chart {
       .enter()
       .append('div')
       .attr('class', this.getNodeClass)
-      .style('background', d => this.getNodeColor(d))
       .call(el => this.setNodeDimension(el))
       .call(el => this.setNodeTooltip(el))
-      .append('span')
-      .html(this.getNodeTitle)
+    // Add node title
+    this.nodes.append('span').html(this.getNodeTitle)
+    // Add node background
+    this.nodes.append('div').style('background', d => this.getNodeColor(d))
   }
 
   // Clear chart
