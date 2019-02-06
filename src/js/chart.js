@@ -333,8 +333,8 @@ export default class Chart {
     }
   }
 
-  // Mouse over x axis item highlight
-  axisXHighlight() {
+  // Mouse over chart highlight
+  highlight() {
     return this
   }
 }

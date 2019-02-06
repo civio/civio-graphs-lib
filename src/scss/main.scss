@@ -86,7 +86,7 @@ body {
   .bar,
   .bar-stack-item {
     opacity: 0.85;
-    &:hover {
+    &.active {
       opacity: 1;
     }
   }

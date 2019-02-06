@@ -111,14 +111,21 @@ export default class BarVerticalChart extends Chart {
     }
   }
 
-  // Mouse over x axis item highlight
-  axisXHighlight(data) {
-    this.el
-      .select('.axis.x')
-      .selectAll('text')
-      .classed('active', false)
-      .filter(d => d === this.x(data))
-      .classed('active', true)
+  // Mouse over chart highlight
+  highlight(data) {
+    // clear highlighted x axis labels
+    this.el.selectAll('.axis.x text').classed('active', false)
+    // clear highlighted bars
+    this.el.selectAll('.bar').classed('active', false)
+    if (data) {
+      // highlight current x axis label
+      this.el
+        .selectAll('.axis.x text')
+        .filter(d => d === this.x(data))
+        .classed('active', true)
+      // highlight current bar
+      this.el.select(`.bar-${this.x(data)}`).classed('active', true)
+    }
     return this
   }
 

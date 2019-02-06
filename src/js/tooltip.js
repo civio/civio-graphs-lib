@@ -141,8 +141,8 @@ export default class Tooltip {
       this.setContent(this.currentData)
       // set tooltip position
       this.setPosition(this.currentData)
-      // Set x axis active text
-      this.chart.axisXHighlight(this.currentData)
+      // highlight current item in chart
+      this.chart.highlight(this.currentData)
     }
     return this
   }
@@ -156,6 +156,10 @@ export default class Tooltip {
   onMouseLeave() {
     // hide tooltip element & point
     this.hide()
+    // clear highlighted item in chart
+    this.chart.highlight(null)
+    // clear current data
+    this.currentData = null
     return this
   }
 }

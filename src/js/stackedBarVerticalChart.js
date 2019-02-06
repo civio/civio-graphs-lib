@@ -61,7 +61,7 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
       .data(d => d)
       .enter()
       .append('rect')
-      .attr('class', 'bar-stack-item')
+      .attr('class', this.barItemClass.bind(this))
       .call(this.setBarDimensions.bind(this))
     return this
   }
@@ -119,20 +119,30 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
     return obj
   }
 
-  // Mouse over x axis item highlight
-  axisXHighlight(data) {
-    this.el
-      .select('.axis.x')
-      .selectAll('text')
-      .classed('active', false)
-      .filter(d => d === data[this.key])
-      .classed('active', true)
+  // Mouse over chart highlight
+  highlight(data) {
+    // clear highlighted x axis labels
+    this.el.selectAll('.axis.x text').classed('active', false)
+    // clear highlighted bars
+    this.el.selectAll('.bar-stack-item').classed('active', false)
+    if (data) {
+      // highlight current x axis label
+      this.el
+        .selectAll('.axis.x text')
+        .filter(d => d === data[this.key])
+        .classed('active', true)
+      // highlight current bar
+      this.el.select(`.bar-${data[this.key]}`).classed('active', true)
+    }
     return this
   }
 
   // Get bar class
   barClass(d) {
     return `bar-stack bar-${slugify(d.key.toLowerCase())}`
+  }
+  barItemClass(d) {
+    return `bar-stack-item bar-${d.data[this.key]}`
   }
 
   // Set scale color for keys
