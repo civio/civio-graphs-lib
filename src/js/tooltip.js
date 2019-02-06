@@ -141,6 +141,8 @@ export default class Tooltip {
       this.setContent(this.currentData)
       // set tooltip position
       this.setPosition(this.currentData)
+      // Set x axis active text
+      this.chart.axisXHighlight(this.currentData)
     }
     return this
   }

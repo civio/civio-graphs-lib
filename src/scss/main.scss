@@ -26,6 +26,10 @@ body {
   svg {
     color: currentColor;
     overflow: visible;
+
+    text {
+      font-family: 'Lato', 'Arial', sans-serif;
+    }
   }
 
   .axis {
@@ -38,6 +42,10 @@ body {
     &.x {
       text {
         opacity: 0.9;
+        &.active {
+          opacity: 1;
+          font-weight: 600;
+        }
       }
       .tick line {
         display: none;
@@ -49,7 +57,7 @@ body {
         display: none;
       }
       text {
-        opacity: 0.6;
+        opacity: 0.75;
       }
       line {
         stroke-opacity: 0.12;

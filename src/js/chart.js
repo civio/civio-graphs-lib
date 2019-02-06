@@ -332,4 +332,9 @@ export default class Chart {
       y: this.scaleY(this.y(d))
     }
   }
+
+  // Mouse over x axis item highlight
+  axisXHighlight() {
+    return this
+  }
 }

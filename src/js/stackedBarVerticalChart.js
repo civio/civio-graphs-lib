@@ -119,6 +119,17 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
     return obj
   }
 
+  // Mouse over x axis item highlight
+  axisXHighlight(data) {
+    this.el
+      .select('.axis.x')
+      .selectAll('text')
+      .classed('active', false)
+      .filter(d => d === data[this.key])
+      .classed('active', true)
+    return this
+  }
+
   // Get bar class
   barClass(d) {
     return `bar-stack bar-${slugify(d.key.toLowerCase())}`
