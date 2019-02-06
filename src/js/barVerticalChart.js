@@ -21,7 +21,8 @@ export default class BarVerticalChart extends Chart {
 
   setTooltip() {
     this.tooltip = new Tooltip(this, {
-      align: false
+      align: 'center',
+      valign: 'bottom'
     })
   }
 
@@ -96,6 +97,18 @@ export default class BarVerticalChart extends Chart {
   // Get scale domains
   scaleXDomain() {
     return this.data.map(this.x)
+  }
+
+  // Tooltip position for a given data
+  getDataPosition(data) {
+    // get data position for current date
+    const i = this.bisector(this.data, this.x(data))
+    const d =
+      i < this.data.length ? this.data[i] : this.data[this.data.length - 1]
+    return {
+      x: this.scaleX(this.x(d)) + this.scaleX.bandwidth() / 2,
+      y: this.scaleY(this.y(d))
+    }
   }
 
   // Get bar class

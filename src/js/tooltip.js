@@ -4,7 +4,8 @@ import { defaults } from 'lodash'
 
 const configDefaults = {
   point: false,
-  align: true,
+  align: 'auto', // auto | center | left | right
+  valign: 'top', // top | bottom
   background: false
 }
 
@@ -19,8 +20,20 @@ export default class Tooltip {
 
   setup() {
     // append tooltip element to chart container
-    this.el = this.chart.el.append('div').attr('class', 'tooltip')
+    this.setupElement()
     // append labels to tooltip element
+    this.setupLabels()
+    return this
+  }
+
+  setupElement() {
+    this.el = this.chart.el
+      .append('div')
+      .attr('class', this.config.background ? 'tooltip tooltip-bkg' : 'tooltip')
+    return this
+  }
+
+  setupLabels() {
     this.el.append('div').attr('class', 'label x')
     this.el.append('div').attr('class', 'label y')
     return this
@@ -57,24 +70,6 @@ export default class Tooltip {
     return this
   }
 
-  setPosition(dataX) {
-    const { x, y } = this.chart.getDataPosition(dataX)
-    // set point position
-    if (this.point) this.point.attr('transform', `translate(${x}, ${y})`)
-    // set tooltip position
-    this.el.style('top', `${y}px`)
-    if (this.config.align) {
-      const isRight = x > this.chart.width / 2
-      this.el
-        .style('left', isRight ? 'auto' : `${x}px`)
-        .style('right', isRight ? `${this.chart.width - x}px` : 'auto')
-        .classed('right', isRight)
-    } else {
-      this.el.style('left', `${x}px`)
-    }
-    return this
-  }
-
   setContent(data) {
     // Set x & y labels
     this.setLabel('x', this.chart.tooltipFormatX()(this.chart.x(data)))
@@ -82,9 +77,59 @@ export default class Tooltip {
     return this
   }
 
-  setLabel(selector, data) {
+  setLabel(selector, data, show = null) {
     this.el.select(`.label.${selector}`).html(data)
+    // show/hide label
+    if (show !== null)
+      this.el.select(`.label.${selector}`).style('opacity', show ? 1 : 0)
     return this
+  }
+
+  setPosition(dataX) {
+    const { x, y } = this.chart.getDataPosition(dataX)
+    // set point position
+    if (this.point) this.point.attr('transform', `translate(${x}, ${y})`)
+    // set x position
+    this.setPositionX(
+      x,
+      this.config.align !== 'auto'
+        ? this.config.align
+        : x > this.chart.width / 2
+        ? 'right'
+        : 'left'
+    )
+    // set y position
+    this.setPositionY(y, this.config.valign)
+    return this
+  }
+
+  setPositionX(x, align) {
+    if (align === 'left') {
+      this.el
+        .style('left', `${x}px`)
+        .style('right', 'auto')
+        .classed('right', false)
+    } else if (align === 'right') {
+      this.el
+        .style('right', `${this.chart.width - x}px`)
+        .style('left', 'auto')
+        .classed('right', true)
+    } else if (align === 'center') {
+      this.el
+        .style(
+          'left',
+          `${x - this.el.node().getBoundingClientRect().width / 2}px`
+        )
+        .classed('center', true)
+    }
+  }
+
+  setPositionY(y, align) {
+    if (align === 'top') {
+      this.el.style('top', `${y}px`)
+    } else if (align === 'bottom') {
+      this.el.style('bottom', `${this.chart.height - y}px`)
+    }
   }
 
   onMouseMove() {
@@ -92,10 +137,10 @@ export default class Tooltip {
     const d = this.chart.getMouseData(event.layerX)
     if (this.currentData !== d) {
       this.currentData = d
-      // set tooltip position
-      this.setPosition(this.currentData)
       // set tooltip content
       this.setContent(this.currentData)
+      // set tooltip position
+      this.setPosition(this.currentData)
     }
     return this
   }

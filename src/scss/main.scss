@@ -83,6 +83,11 @@ body {
     }
   }
 
+  .bar-stack-label {
+    fill: $color-text;
+    z-index: 2;
+  }
+
   .treemap-node {
     position: absolute;
     font-size: 13px;
@@ -125,13 +130,21 @@ body {
     margin-top: -0.75em;
     padding: 0px 10px;
     opacity: 0;
-    text-shadow: 1px 0px 6px white, 0px 1px 6px white, -1px 0px 6px white,
-      0px -1px 6px white;
     pointer-events: none;
 
     &.right {
       text-align: right;
     }
+    &.center {
+      text-align: center;
+    }
+  }
+
+  .tooltip-bkg {
+    padding: 0.5rem;
+    max-width: 200px;
+    background: white;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.3);
   }
 
   .tooltip-point {
@@ -175,14 +188,38 @@ body {
 
 // Chart bar vertical styles
 
+.chart-line,
+.chart-area {
+  .tooltip {
+    text-shadow: 1px 0px 6px white, 0px 1px 6px white, -1px 0px 6px white,
+      0px -1px 6px white;
+  }
+}
+
 .chart-bar-vertical {
   .tooltip {
     padding: 0;
-    text-shadow: none;
-    margin-top: -1.5em;
+    margin: 0 0 4px;
+    //margin-top: -1.5em;
 
     .x.label {
       display: none;
+    }
+  }
+}
+
+.chart-stacked-bar-vertical {
+  .tooltip {
+    width: 300px;
+    margin: 0;
+
+    .label {
+      position: absolute;
+      left: 0;
+      right: 0;
+      margin-bottom: -0.5em;
+      line-height: 1em;
+      white-space: nowrap;
     }
   }
 }
