@@ -1,4 +1,4 @@
-import { sum, max } from 'd3-array'
+import { max } from 'd3-array'
 import { quantize } from 'd3-interpolate'
 import { scaleOrdinal } from 'd3-scale'
 import { interpolateSpectral } from 'd3-scale-chromatic'
@@ -29,7 +29,9 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
 
   setTooltip() {
     this.tooltip = new TooltipStacked(this, {
-      align: false
+      align: 'center',
+      valign: 'bottom'
+      //background: true
     })
   }
 
@@ -53,6 +55,8 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
       .append('g')
       .attr('fill', (d, i) => this.scaleColor(this.data.keys[i]))
       .attr('class', this.barClass.bind(this))
+    // add stacked bars items
+    this.bars
       .selectAll('.bar-stack-item')
       .data(d => d)
       .enter()
@@ -96,13 +100,23 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
 
   // Tooltip position for a given data
   getDataPosition(data) {
-    // get sum of current data keys
-    const y = sum(this.data.keys, key => +data[key])
-    // get data position for current data
-    return {
-      x: this.scaleX(data[this.key]),
-      y: this.scaleY(y)
+    // get current data x value
+    const x = data[this.key]
+    // get x position for current data
+    const obj = {
+      x: this.scaleX(x) + this.scaleX.bandwidth() / 2,
+      y: {}
     }
+    // get x data index
+    const index = this.data.values.indexOf(x)
+    // get y position for each key
+    this.data.keys.forEach((key, i) => {
+      if (data[key]) {
+        const y = this.data[i][index]
+        obj.y[slugify(key.toLowerCase())] = this.scaleY((y[0] + y[1]) / 2)
+      }
+    })
+    return obj
   }
 
   // Get bar class
