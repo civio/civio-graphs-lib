@@ -2,6 +2,8 @@ import { treemap } from 'd3-hierarchy'
 import { scaleOrdinal } from 'd3-scale'
 import { schemeCategory10 } from 'd3-scale-chromatic'
 
+import slugify from 'slugify'
+
 import Chart from './chart'
 
 export default class TreemapChart extends Chart {
@@ -23,6 +25,7 @@ export default class TreemapChart extends Chart {
     // .padding(1)
     // color scale
     this.scaleColor = this.getScaleColor()
+    if (this.scaleColor) this.scaleColor.range(this.scaleColorRange())
     return this
   }
 
@@ -45,7 +48,7 @@ export default class TreemapChart extends Chart {
       .data(this.treemap(this.data).leaves())
       .enter()
       .append('div')
-      .attr('class', this.getNodeClass)
+      .attr('class', this.getNodeClass.bind(this))
       .call(el => this.setNodeDimension(el))
       .call(el => this.setNodeTooltip(el))
     // Add node title
@@ -104,15 +107,21 @@ export default class TreemapChart extends Chart {
   }
   // Set scale color
   getScaleColor() {
-    return scaleOrdinal().range(schemeCategory10)
+    return scaleOrdinal()
+  }
+  scaleColorRange() {
+    return schemeCategory10
   }
 
-  getNodeClass() {
-    return 'treemap-node'
+  getNodeClass(d) {
+    return `node node-${slugify(this.x(d).toLowerCase())}`
   }
   getNodeColor(d) {
-    while (d.depth > 1) d = d.parent
-    return this.scaleColor(this.x(d))
+    if (this.scaleColor) {
+      while (d.depth > 1) d = d.parent
+      return this.scaleColor(this.x(d))
+    }
+    return ''
   }
   getNodeTitle(d) {
     return this.x(d)

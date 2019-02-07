@@ -94,12 +94,16 @@ body {
     }
   }
 
+  .bar-stack-item {
+    fill: currentColor;
+  }
+
   .bar-stack-label {
     fill: $color-text;
     z-index: 2;
   }
 
-  .treemap-node {
+  .node {
     position: absolute;
     font-size: 13px;
     line-height: 15px;
@@ -120,6 +124,7 @@ body {
       bottom: 0;
       right: 0;
       outline: 1px solid white;
+      background: currentColor;
       opacity: $opacity;
     }
 
@@ -177,11 +182,12 @@ body {
     span {
       display: inline-block;
       position: relative;
-      top: 2px;
-      width: 13px;
-      height: 13px;
+      top: 1px;
+      width: 12px;
+      height: 12px;
       margin-right: 3px;
-      background: red;
+      background: currentColor;
+      opacity: $opacityActive;
     }
   }
 }

@@ -17,7 +17,11 @@ export default class Legend {
       this.el
         .append('div')
         .attr('class', `legend-label ${slugify(key.toLowerCase())}`)
-        .html(`<span style="background: ${colors(key)}"></span> ${key}`)
+        .html(
+          colors
+            ? `<span style="background: ${colors(key)}"></span> ${key}`
+            : `<span></span> ${key}`
+        )
     })
     return this
   }

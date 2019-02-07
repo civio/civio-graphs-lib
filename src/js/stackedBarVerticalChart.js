@@ -21,9 +21,12 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
     super.setScales()
     // setup scale color
     this.scaleColor = this.getScaleColor()
-      .unknown('#ccc')
-      .domain(this.scaleColorDomain())
-      .range(this.scaleColorRange())
+    if (this.scaleColor) {
+      this.scaleColor
+        .unknown('#ccc')
+        .domain(this.scaleColorDomain())
+        .range(this.scaleColorRange())
+    }
     return this
   }
 
@@ -53,8 +56,9 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
       .data(this.data)
       .enter()
       .append('g')
-      .attr('fill', (d, i) => this.scaleColor(this.data.keys[i]))
       .attr('class', this.barClass.bind(this))
+    if (this.scaleColor)
+      this.bars.attr('color', (d, i) => this.scaleColor(this.data.keys[i]))
     // add stacked bars items
     this.bars
       .selectAll('.bar-stack-item')
@@ -132,7 +136,7 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
         .filter(d => d === data[this.key])
         .classed('active', true)
       // highlight current bar
-      this.el.select(`.bar-${data[this.key]}`).classed('active', true)
+      this.el.selectAll(`.bar-${data[this.key]}`).classed('active', true)
     }
     return this
   }
