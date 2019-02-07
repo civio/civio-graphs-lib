@@ -27,7 +27,7 @@
     "build-css": "npm run css-compile && npm run css-minify",
     "build-css:watch": "node-sass --output-style expanded --source-map true --source-map-contents true --precision 6 --watch src/scss/main.scss dist/civio-graphs-lib.css",
     "build-js": "eslint src && rollup -c",
-    "prepublish": "rm -rf ./dist && npm run build"
+    "prepublishOnly": "rm -rf ./dist && npm run build"
   },
   "dependencies": {
     "d3-array": "1",
