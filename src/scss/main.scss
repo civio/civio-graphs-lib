@@ -10,6 +10,9 @@ $color-qclo: #ff7550;
 $color-qm: #18dfa1;
 $color-tdas: #d3514a;
 
+$opacity: 0.65;
+$opacityActive: 0.75;
+
 html,
 body {
   height: 100%;
@@ -80,14 +83,14 @@ body {
   }
 
   .area {
-    opacity: 0.12;
+    opacity: 0.15;
   }
 
   .bar,
   .bar-stack-item {
-    opacity: 0.85;
+    opacity: $opacity;
     &.active {
-      opacity: 1;
+      opacity: $opacityActive;
     }
   }
 
@@ -117,7 +120,7 @@ body {
       bottom: 0;
       right: 0;
       outline: 1px solid white;
-      opacity: 0.65;
+      opacity: $opacity;
     }
 
     &:hover {
@@ -125,7 +128,7 @@ body {
 
       > div {
         outline-width: 2px;
-        opacity: 0.75;
+        opacity: $opacityActive;
       }
     }
   }
@@ -158,6 +161,28 @@ body {
   .tooltip-point {
     fill: currentColor;
     stroke: none;
+  }
+
+  .legend {
+    text-align: center;
+    margin: 1.5rem 0 2rem;
+  }
+
+  .legend-label {
+    color: $color-text;
+    display: inline-block;
+    margin: 0 10px;
+    font-size: 14px;
+
+    span {
+      display: inline-block;
+      position: relative;
+      top: 2px;
+      width: 13px;
+      height: 13px;
+      margin-right: 3px;
+      background: red;
+    }
   }
 }
 
@@ -228,6 +253,7 @@ body {
       margin-bottom: -0.5em;
       line-height: 1em;
       white-space: nowrap;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
     }
   }
 }
