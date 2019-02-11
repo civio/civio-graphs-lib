@@ -236,8 +236,8 @@ export default class Chart {
     if (this.scaleX) this.scaleX.range(this.scaleXRange())
     if (this.scaleY) this.scaleY.range(this.scaleYRange())
     // Resize axis
-    if (this.axisX) select('.x.axis').call(this.axisX)
-    if (this.axisY) select('.y.axis').call(this.axisY)
+    if (this.axisX) this.chart.select('.x.axis').call(this.axisX)
+    if (this.axisY) this.chart.select('.y.axis').call(this.axisY)
     return this
   }
 
