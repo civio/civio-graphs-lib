@@ -395,8 +395,8 @@ class Chart {
     if (this.scaleX) this.scaleX.range(this.scaleXRange());
     if (this.scaleY) this.scaleY.range(this.scaleYRange());
     // Resize axis
-    if (this.axisX) d3Selection.select('.x.axis').call(this.axisX);
-    if (this.axisY) d3Selection.select('.y.axis').call(this.axisY);
+    if (this.axisX) this.chart.select('.x.axis').call(this.axisX);
+    if (this.axisY) this.chart.select('.y.axis').call(this.axisY);
     return this
   }
 
@@ -800,10 +800,13 @@ class StackedBarVerticalChart extends BarVerticalChart {
   setScales() {
     super.setScales();
     // setup scale color
-    this.scaleColor = this.getScaleColor()
-      .unknown('#ccc')
-      .domain(this.scaleColorDomain())
-      .range(this.scaleColorRange());
+    this.scaleColor = this.getScaleColor();
+    if (this.scaleColor) {
+      this.scaleColor
+        .unknown('#ccc')
+        .domain(this.scaleColorDomain())
+        .range(this.scaleColorRange());
+    }
     return this
   }
 
@@ -833,8 +836,9 @@ class StackedBarVerticalChart extends BarVerticalChart {
       .data(this.data)
       .enter()
       .append('g')
-      .attr('fill', (d, i) => this.scaleColor(this.data.keys[i]))
       .attr('class', this.barClass.bind(this));
+    if (this.scaleColor)
+      this.bars.attr('color', (d, i) => this.scaleColor(this.data.keys[i]));
     // add stacked bars items
     this.bars
       .selectAll('.bar-stack-item')
@@ -852,6 +856,25 @@ class StackedBarVerticalChart extends BarVerticalChart {
       .attr('y', d => this.scaleY(d[1]))
       .attr('height', d => this.scaleY(d[0]) - this.scaleY(d[1]))
       .attr('width', this.scaleX.bandwidth());
+  }
+
+  // Clear chart
+  clear() {
+    super.clear();
+    // Remove bars
+    this.chart.selectAll('g').remove();
+    return this
+  }
+
+  // Resize chart
+  resize() {
+    super.resize();
+    // Update bars dimensions
+    if (this.bars)
+      this.bars
+        .selectAll('.bar-stack-item')
+        .call(this.setBarDimensions.bind(this));
+    return this
   }
 
   // Root element class
@@ -912,7 +935,7 @@ class StackedBarVerticalChart extends BarVerticalChart {
         .filter(d => d === data[this.key])
         .classed('active', true);
       // highlight current bar
-      this.el.select(`.bar-${data[this.key]}`).classed('active', true);
+      this.el.selectAll(`.bar-${data[this.key]}`).classed('active', true);
     }
     return this
   }
@@ -959,6 +982,7 @@ class TreemapChart extends Chart {
     // .padding(1)
     // color scale
     this.scaleColor = this.getScaleColor();
+    if (this.scaleColor) this.scaleColor.range(this.scaleColorRange());
     return this
   }
 
@@ -981,7 +1005,7 @@ class TreemapChart extends Chart {
       .data(this.treemap(this.data).leaves())
       .enter()
       .append('div')
-      .attr('class', this.getNodeClass)
+      .attr('class', this.getNodeClass.bind(this))
       .call(el => this.setNodeDimension(el))
       .call(el => this.setNodeTooltip(el));
     // Add node title
@@ -1040,15 +1064,21 @@ class TreemapChart extends Chart {
   }
   // Set scale color
   getScaleColor() {
-    return d3Scale.scaleOrdinal().range(d3ScaleChromatic.schemeCategory10)
+    return d3Scale.scaleOrdinal()
+  }
+  scaleColorRange() {
+    return d3ScaleChromatic.schemeCategory10
   }
 
-  getNodeClass() {
-    return 'treemap-node'
+  getNodeClass(d) {
+    return `node node-${slugify(this.x(d).toLowerCase())}`
   }
   getNodeColor(d) {
-    while (d.depth > 1) d = d.parent;
-    return this.scaleColor(this.x(d))
+    if (this.scaleColor) {
+      while (d.depth > 1) d = d.parent;
+      return this.scaleColor(this.x(d))
+    }
+    return ''
   }
   getNodeTitle(d) {
     return this.x(d)
@@ -1081,7 +1111,11 @@ class Legend {
       this.el
         .append('div')
         .attr('class', `legend-label ${slugify(key.toLowerCase())}`)
-        .html(`<span style="background: ${colors(key)}"></span> ${key}`);
+        .html(
+          colors
+            ? `<span style="background: ${colors(key)}"></span> ${key}`
+            : `<span></span> ${key}`
+        );
     });
     return this
   }
