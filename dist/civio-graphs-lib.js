@@ -169,6 +169,116 @@ class Tooltip {
   }
 }
 
+// format & timeFormat default locales
+// https://github.com/d3/d3-time-format#locales
+// https://github.com/d3/d3-format/#locales
+
+const formatDefaultLocale = {
+  en: {
+    decimal: '.',
+    thousands: ',',
+    grouping: [3],
+    currency: ['$', '']
+  },
+  es: {
+    decimal: ',',
+    thousands: '.',
+    grouping: [3],
+    currency: ['', '\u00a0€']
+  }
+};
+
+const timeFormatDefaultLocale = {
+  en: {
+    dateTime: '%x, %X',
+    date: '%-m/%-d/%Y',
+    time: '%-I:%M:%S %p',
+    periods: ['AM', 'PM'],
+    days: [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ],
+    shortDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    months: [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ],
+    shortMonths: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ]
+  },
+  es: {
+    dateTime: '%A, %e de %B de %Y, %X',
+    date: '%d/%m/%Y',
+    time: '%H:%M:%S',
+    periods: ['AM', 'PM'],
+    days: [
+      'domingo',
+      'lunes',
+      'martes',
+      'miércoles',
+      'jueves',
+      'viernes',
+      'sábado'
+    ],
+    shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
+    months: [
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre'
+    ],
+    shortMonths: [
+      'ene',
+      'feb',
+      'mar',
+      'abr',
+      'may',
+      'jun',
+      'jul',
+      'ago',
+      'sep',
+      'oct',
+      'nov',
+      'dic'
+    ]
+  }
+};
+
 const configDefaults$1 = {
   // we can define an aspectRatio to calculate height or define a fixed height
   aspectRatio: 2,
@@ -199,8 +309,8 @@ class Chart {
     // Setup config object
     this.config = lodash.defaultsDeep(config, configDefaults$1);
     this.width = 0;
-    // Set chart
     this.setChart();
+    this.setFormatLocale();
   }
 
   setChart() {
@@ -210,7 +320,6 @@ class Chart {
 
   setup(data) {
     this.setData(data);
-    this.setFormat();
     this.onResize();
     this.setScales();
     this.setAxis();
@@ -221,63 +330,6 @@ class Chart {
 
   setData(data) {
     this.data = data;
-  }
-
-  // Set formats
-  setFormat() {
-    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
-    d3Format.formatDefaultLocale({
-      decimal: this.config.lang === 'es' ? ',' : '.',
-      thousands: this.config.lang === 'es' ? '.' : ',',
-      grouping: [3],
-      currency: this.currencyFormat()
-    });
-    if (this.config.lang === 'es') {
-      d3TimeFormat.timeFormatDefaultLocale({
-        dateTime: '%A, %e de %B de %Y, %X',
-        date: '%d/%m/%Y',
-        time: '%H:%M:%S',
-        periods: ['AM', 'PM'],
-        days: [
-          'domingo',
-          'lunes',
-          'martes',
-          'miércoles',
-          'jueves',
-          'viernes',
-          'sábado'
-        ],
-        shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-        months: [
-          'enero',
-          'febrero',
-          'marzo',
-          'abril',
-          'mayo',
-          'junio',
-          'julio',
-          'agosto',
-          'septiembre',
-          'octubre',
-          'noviembre',
-          'diciembre'
-        ],
-        shortMonths: [
-          'ene',
-          'feb',
-          'mar',
-          'abr',
-          'may',
-          'jun',
-          'jul',
-          'ago',
-          'sep',
-          'oct',
-          'nov',
-          'dic'
-        ]
-      });
-    }
   }
 
   // Set scales
@@ -400,6 +452,25 @@ class Chart {
     return this
   }
 
+  // Set format locales
+  setFormatLocale() {
+    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
+    this.formatLocale = d3Format.formatLocale(formatDefaultLocale[this.config.lang]);
+    this.timeFormatLocale = d3TimeFormat.timeFormatLocale(
+      timeFormatDefaultLocale[this.config.lang]
+    );
+  }
+
+  // setup format from formatLocale
+  format(specifier) {
+    return this.formatLocale.format(specifier)
+  }
+
+  // setup timeFormat from timeFormatLocale
+  timeFormat(specifier) {
+    return this.timeFormatLocale.format(specifier)
+  }
+
   // Getters/Setters
 
   // Root element class
@@ -428,21 +499,20 @@ class Chart {
       .ticks(this.height / 80)
   }
   axisFormatX() {
-    return d3TimeFormat.timeFormat('%Y')
+    return this.timeFormat('%Y')
   }
   axisFormatY() {
-    return d3Format.format('d')
+    return this.format(',d')
   }
 
   // tooltip formats
   tooltipFormatX() {
-    return d3TimeFormat.timeFormat(this.config.lang === 'es' ? '%d %B, %Y' : '%B %d, %Y')
+    return this.timeFormat(
+      this.config.lang === 'es' ? '%d %B, %Y' : '%B %d, %Y'
+    )
   }
   tooltipFormatY() {
-    return d3Format.format('$,d')
-  }
-  currencyFormat() {
-    return ['', '\u00a0€']
+    return this.format('$,d')
   }
 
   // Get scales
@@ -1129,6 +1199,8 @@ exports.StackedBarVerticalChart = StackedBarVerticalChart;
 exports.TreemapChart = TreemapChart;
 exports.Legend = Legend;
 exports.Tooltip = Tooltip;
+exports.formatDefaultLocale = formatDefaultLocale;
+exports.timeFormatDefaultLocale = timeFormatDefaultLocale;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
