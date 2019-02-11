@@ -78,6 +78,25 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
       .attr('width', this.scaleX.bandwidth())
   }
 
+  // Clear chart
+  clear() {
+    super.clear()
+    // Remove bars
+    this.chart.selectAll('g').remove()
+    return this
+  }
+
+  // Resize chart
+  resize() {
+    super.resize()
+    // Update bars dimensions
+    if (this.bars)
+      this.bars
+        .selectAll('.bar-stack-item')
+        .call(this.setBarDimensions.bind(this))
+    return this
+  }
+
   // Root element class
   chartClass() {
     return 'chart chart-stacked-bar-vertical'
