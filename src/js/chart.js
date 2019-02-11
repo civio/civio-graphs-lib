@@ -1,14 +1,15 @@
 import { bisector, extent } from 'd3-array'
 import { axisLeft, axisBottom } from 'd3-axis'
-import { format, formatDefaultLocale } from 'd3-format'
+import { formatLocale } from 'd3-format'
 import { scaleLinear, scaleTime } from 'd3-scale'
 import { select } from 'd3-selection'
 import { timeYear } from 'd3-time'
-import { timeFormat, timeFormatDefaultLocale } from 'd3-time-format'
+import { timeFormatLocale } from 'd3-time-format'
 
 import { debounce, defaultsDeep } from 'lodash'
 
 import Tooltip from './tooltip'
+import { formatDefaultLocale, timeFormatDefaultLocale } from './locales'
 
 const configDefaults = {
   // we can define an aspectRatio to calculate height or define a fixed height
@@ -40,8 +41,8 @@ export default class Chart {
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
     this.width = 0
-    // Set chart
     this.setChart()
+    this.setFormatLocale()
   }
 
   setChart() {
@@ -51,7 +52,6 @@ export default class Chart {
 
   setup(data) {
     this.setData(data)
-    this.setFormat()
     this.onResize()
     this.setScales()
     this.setAxis()
@@ -62,63 +62,6 @@ export default class Chart {
 
   setData(data) {
     this.data = data
-  }
-
-  // Set formats
-  setFormat() {
-    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
-    formatDefaultLocale({
-      decimal: this.config.lang === 'es' ? ',' : '.',
-      thousands: this.config.lang === 'es' ? '.' : ',',
-      grouping: [3],
-      currency: this.currencyFormat()
-    })
-    if (this.config.lang === 'es') {
-      timeFormatDefaultLocale({
-        dateTime: '%A, %e de %B de %Y, %X',
-        date: '%d/%m/%Y',
-        time: '%H:%M:%S',
-        periods: ['AM', 'PM'],
-        days: [
-          'domingo',
-          'lunes',
-          'martes',
-          'miércoles',
-          'jueves',
-          'viernes',
-          'sábado'
-        ],
-        shortDays: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'],
-        months: [
-          'enero',
-          'febrero',
-          'marzo',
-          'abril',
-          'mayo',
-          'junio',
-          'julio',
-          'agosto',
-          'septiembre',
-          'octubre',
-          'noviembre',
-          'diciembre'
-        ],
-        shortMonths: [
-          'ene',
-          'feb',
-          'mar',
-          'abr',
-          'may',
-          'jun',
-          'jul',
-          'ago',
-          'sep',
-          'oct',
-          'nov',
-          'dic'
-        ]
-      })
-    }
   }
 
   // Set scales
@@ -241,6 +184,25 @@ export default class Chart {
     return this
   }
 
+  // Set format locales
+  setFormatLocale() {
+    // Set formatDefaultLocale & timeFormatDefaultLocale based on config.lang
+    this.formatLocale = formatLocale(formatDefaultLocale[this.config.lang])
+    this.timeFormatLocale = timeFormatLocale(
+      timeFormatDefaultLocale[this.config.lang]
+    )
+  }
+
+  // setup format from formatLocale
+  format(specifier) {
+    return this.formatLocale.format(specifier)
+  }
+
+  // setup timeFormat from timeFormatLocale
+  timeFormat(specifier) {
+    return this.timeFormatLocale.format(specifier)
+  }
+
   // Getters/Setters
 
   // Root element class
@@ -269,21 +231,20 @@ export default class Chart {
       .ticks(this.height / 80)
   }
   axisFormatX() {
-    return timeFormat('%Y')
+    return this.timeFormat('%Y')
   }
   axisFormatY() {
-    return format('d')
+    return this.format(',d')
   }
 
   // tooltip formats
   tooltipFormatX() {
-    return timeFormat(this.config.lang === 'es' ? '%d %B, %Y' : '%B %d, %Y')
+    return this.timeFormat(
+      this.config.lang === 'es' ? '%d %B, %Y' : '%B %d, %Y'
+    )
   }
   tooltipFormatY() {
-    return format('$,d')
-  }
-  currencyFormat() {
-    return ['', '\u00a0€']
+    return this.format('$,d')
   }
 
   // Get scales
