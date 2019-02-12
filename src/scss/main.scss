@@ -221,20 +221,16 @@ body {
 
 .chart-line,
 .chart-area {
-  .tooltip .y.label {
-    font-weight: 600;
+  .tooltip {
+    text-shadow: 1px 0px 6px white, 0px 1px 6px white, -1px 0px 6px white,
+      0px -1px 6px white;
+    .y.label {
+      font-weight: 600;
+    }
   }
 }
 
 // Chart bar vertical styles
-
-.chart-line,
-.chart-area {
-  .tooltip {
-    text-shadow: 1px 0px 6px white, 0px 1px 6px white, -1px 0px 6px white,
-      0px -1px 6px white;
-  }
-}
 
 .chart-bar-vertical {
   .tooltip {
@@ -260,6 +256,47 @@ body {
       line-height: 1em;
       white-space: nowrap;
       text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+  }
+}
+
+// Chart bar horizontal styles
+
+.chart-bar-horizontal {
+  .bar-group {
+    display: flex;
+    font-size: 0.875rem;
+  }
+  .bar-label,
+  .bar-value {
+    color: $color-text;
+  }
+  .bar-label {
+    padding-right: 5px;
+    line-height: 24px;
+    text-align: right;
+  }
+  .bar-container {
+    position: relative;
+    flex-grow: 1;
+  }
+  .bar {
+    height: 24px;
+    background: currentColor;
+    margin-bottom: 10px;
+  }
+  .bar-value {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 4px;
+    line-height: 24px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+    //opacity: 0;
+  }
+  .bar-group:hover {
+    .bar {
+      opacity: $opacityActive;
     }
   }
 }
