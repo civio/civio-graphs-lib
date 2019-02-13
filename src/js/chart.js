@@ -135,12 +135,8 @@ export default class Chart {
 
   // Render chart based on data
   render() {
-    if (this.axisX) {
-      this.chart.append('g').call(this.axisX)
-    }
-    if (this.axisY) {
-      this.chart.append('g').call(this.axisY)
-    }
+    if (this.axisX) this.chart.append('g').call(this.axisX)
+    if (this.axisY) this.chart.append('g').call(this.axisY)
     if (this.tooltip) this.tooltip.render()
     this.setResize()
     return this
