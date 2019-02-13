@@ -37,7 +37,7 @@ export default class Chart {
     if (this.el.size() === 0)
       throw new Error(`Can't find root element ${selector}`)
     // Set element class
-    this.el.attr('class', this.chartClass())
+    this.el.classed(this.chartClass(), true)
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
     this.width = 0
