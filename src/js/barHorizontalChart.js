@@ -8,7 +8,7 @@ import Chart from './chart'
 export default class BarHorizontalChart extends Chart {
   // Override chart as html div
   setChart() {
-    this.chart = this.el.append('div')
+    this.chart = this.el
     return this
   }
 
@@ -51,7 +51,7 @@ export default class BarHorizontalChart extends Chart {
       .append('div')
       .attr('class', 'bar-value')
       .html(d => this.tooltipFormatY()(this.y(d)))
-    this.setBarLabelsWidth()
+    if (this.config.labelsTop !== true) this.setBarLabelsWidth()
     return this
   }
 
@@ -94,7 +94,9 @@ export default class BarHorizontalChart extends Chart {
 
   // Root element class
   chartClass() {
-    return 'chart chart-bar-horizontal'
+    let str = 'chart chart-bar-horizontal'
+    if (this.config.labelsTop) str += ' chart-bar-horizontal-label-top'
+    return str
   }
 
   // tooltip formats

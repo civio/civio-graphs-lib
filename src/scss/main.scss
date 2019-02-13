@@ -270,27 +270,28 @@ body {
   .bar-label,
   .bar-value {
     color: $color-text;
+    line-height: 25px;
+    white-space: nowrap;
   }
   .bar-label {
     padding-right: 5px;
-    line-height: 24px;
     text-align: right;
+    font-weight: 600;
   }
   .bar-container {
     position: relative;
     flex-grow: 1;
+    margin-bottom: 6px;
   }
   .bar {
-    height: 24px;
+    height: 25px;
     background: currentColor;
-    margin-bottom: 10px;
   }
   .bar-value {
     position: absolute;
     top: 0;
     right: 0;
     padding: 0 4px;
-    line-height: 24px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
     //opacity: 0;
   }
@@ -298,6 +299,15 @@ body {
     .bar {
       opacity: $opacityActive;
     }
+  }
+}
+
+.chart-bar-horizontal-label-top {
+  .bar-group {
+    display: block;
+  }
+  .bar-label {
+    text-align: left;
   }
 }
 
