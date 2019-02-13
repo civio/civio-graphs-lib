@@ -36,10 +36,10 @@ export default class Chart {
     // Launch error if no selector found
     if (this.el.size() === 0)
       throw new Error(`Can't find root element ${selector}`)
-    // Set element class
-    this.el.classed(this.chartClass(), true)
     // Setup config object
     this.config = defaultsDeep(config, configDefaults)
+    // Set element class
+    this.el.classed(this.chartClass(), true)
     this.width = 0
     this.setChart()
     this.setFormatLocale()
