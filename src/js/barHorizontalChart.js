@@ -76,12 +76,19 @@ export default class BarHorizontalChart extends Chart {
     const container = select(el)
     const barValue = container.select('.bar-value')
     const value = this.scaleY(this.y(container.datum()))
-    const barWidth = container.select('.bar').node().offsetWidth
-    const barValueWidth = barValue.node().offsetWidth
-    if (barWidth > barValueWidth) {
-      barValue.style('right', `${100 - value}%`).style('left', 'auto')
+    if (this.config.valuesPosition === 'inside') {
+      barValue.style('right', `${100 - value}%`).style('left', 'auto') // set labels inside
+    } else if (this.config.valuesPosition === 'outside') {
+      barValue.style('left', `${value}%`).style('right', 'auto') // set labels outside
     } else {
-      barValue.style('left', `${value}%`).style('right', 'auto')
+      // set labels auto: inside or outside depending on bar width
+      const barWidth = container.select('.bar').node().offsetWidth
+      const barValueWidth = barValue.node().offsetWidth
+      if (barWidth > barValueWidth) {
+        barValue.style('right', `${100 - value}%`).style('left', 'auto')
+      } else {
+        barValue.style('left', `${value}%`).style('right', 'auto')
+      }
     }
   }
 
