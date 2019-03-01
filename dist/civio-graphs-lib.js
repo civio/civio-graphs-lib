@@ -304,10 +304,10 @@ class Chart {
     // Launch error if no selector found
     if (this.el.size() === 0)
       throw new Error(`Can't find root element ${selector}`)
-    // Set element class
-    this.el.attr('class', this.chartClass());
     // Setup config object
     this.config = lodash.defaultsDeep(config, configDefaults$1);
+    // Set element class
+    this.el.classed(this.chartClass(), true);
     this.width = 0;
     this.setChart();
     this.setFormatLocale();
@@ -403,12 +403,8 @@ class Chart {
 
   // Render chart based on data
   render() {
-    if (this.config.axis.x) {
-      this.chart.append('g').call(this.axisX);
-    }
-    if (this.config.axis.y) {
-      this.chart.append('g').call(this.axisY);
-    }
+    if (this.axisX) this.chart.append('g').call(this.axisX);
+    if (this.axisY) this.chart.append('g').call(this.axisY);
     if (this.tooltip) this.tooltip.render();
     this.setResize();
     return this
@@ -676,6 +672,118 @@ class AreaChart extends LineChart {
   }
 }
 
+class BarHorizontalChart extends Chart {
+  // Override chart as html div
+  setChart() {
+    this.chart = this.el;
+    return this
+  }
+
+  // Override tooltip
+  setTooltip() {}
+
+  // Override axis
+  setAxis() {
+    return this
+  }
+
+  // Render chart
+  render() {
+    super.render();
+    this.renderBars();
+    this.resize(); // we need to check bar values alignment
+    return this
+  }
+
+  // Render chart bars
+  renderBars() {
+    this.barGroups = this.chart
+      .selectAll('div')
+      .data(this.data)
+      .enter()
+      .append('div')
+      .attr('class', 'bar-group');
+    this.barLabels = this.barGroups
+      .append('div')
+      .attr('class', 'bar-label')
+      .html(d => this.tooltipFormatX()(this.x(d)));
+    this.barContainers = this.barGroups
+      .append('div')
+      .attr('class', this.barClass.bind(this));
+    this.barContainers
+      .append('div')
+      .attr('class', 'bar')
+      .style('width', d => `${this.scaleY(this.y(d))}%`);
+    this.barContainers
+      .append('div')
+      .attr('class', 'bar-value')
+      .html(d => this.tooltipFormatY()(this.y(d)));
+    if (this.config.labelsTop !== true) this.setBarLabelsWidth();
+    return this
+  }
+
+  setBarLabelsWidth() {
+    const labelsWidth = this.barLabels
+      .nodes()
+      .map(el => d3Selection.select(el).node().offsetWidth);
+    const labelsMaxWidth = d3Array.max(labelsWidth);
+    this.barLabels.style('width', `${labelsMaxWidth}px`);
+  }
+
+  // Get bar class
+  barClass(d) {
+    return `bar-container bar-${slugify(
+      this.x(d)
+        .toString()
+        .toLowerCase()
+    )}`
+  }
+
+  setBarValuePosition(el) {
+    const container = d3Selection.select(el);
+    const barValue = container.select('.bar-value');
+    const value = this.scaleY(this.y(container.datum()));
+    if (this.config.valuesPosition === 'inside') {
+      barValue.style('right', `${100 - value}%`).style('left', 'auto'); // set labels inside
+    } else if (this.config.valuesPosition === 'outside') {
+      barValue.style('left', `${value}%`).style('right', 'auto'); // set labels outside
+    } else {
+      // set labels auto: inside or outside depending on bar width
+      const barWidth = container.select('.bar').node().offsetWidth;
+      const barValueWidth = barValue.node().offsetWidth;
+      if (barWidth > barValueWidth) {
+        barValue.style('right', `${100 - value}%`).style('left', 'auto');
+      } else {
+        barValue.style('left', `${value}%`).style('right', 'auto');
+      }
+    }
+  }
+
+  // Resize chart
+  resize() {
+    if (this.barContainers)
+      this.barContainers.nodes().forEach(this.setBarValuePosition.bind(this));
+    return this
+  }
+
+  // Root element class
+  chartClass() {
+    let str = 'chart chart-bar-horizontal';
+    if (this.config.labelsTop) str += ' chart-bar-horizontal-label-top';
+    return str
+  }
+
+  // tooltip formats
+  tooltipFormatX() {
+    return d => d
+  }
+
+  // Use scaleY as 0-100 percentage value
+  scaleYRange() {
+    return [0, 100]
+  }
+}
+
 class BarVerticalChart extends Chart {
   // Set scales
   setScales() {
@@ -812,6 +920,19 @@ class BarVerticalChart extends Chart {
   // Set scaleX padding
   scaleXPadding() {
     return 0.2
+  }
+}
+
+class StackedBarHorizontalChart extends BarHorizontalChart {
+  setup(data, key) {
+    this.key = key;
+    super.setup(data);
+    return this
+  }
+
+  // Root element class
+  chartClass() {
+    return 'chart chart-stacked-bar-horizontal'
   }
 }
 
@@ -1166,6 +1287,53 @@ class TreemapChart extends Chart {
   }
 }
 
+class Table {
+  constructor(selector, columns) {
+    // Select table element
+    this.el = d3Selection.select(selector);
+    // Launch error if no selector found
+    if (this.el.size() === 0)
+      throw new Error(`Can't find root element ${selector}`)
+    // Validate columns is an array & each element is an object with a key attribute
+    if (!columns.length)
+      throw new Error('Table columns is not an array or is empty')
+    columns.forEach(d => {
+      if (!d.hasOwnProperty('key'))
+        throw new Error(`Table column has no key defined: ${JSON.stringify(d)}`)
+    });
+    this.columns = columns;
+    // Add table head & body
+    this.thead = this.el.append('thead').append('tr');
+    this.tbody = this.el.append('tbody');
+    // set table header
+    this.columns.forEach(this.addColumn.bind(this));
+  }
+
+  addColumn(column) {
+    const td = this.thead.append('th');
+    if (column.align) td.attr('class', `text-${column.align}`);
+    td.html(column.name ? column.name : column.key);
+  }
+
+  addData(data) {
+    // get each data item
+    data.forEach(item => {
+      const tr = this.tbody.append('tr');
+      // get each column
+      this.columns.forEach(key => {
+        const td = tr.append('td');
+        const value = item[key.key];
+        // set value if defined
+        if (value) {
+          td.html(key.callback ? key.callback(item) : value);
+          if (key.class) td.attr('class', key.class(item));
+          if (key.dataSort) td.attr('data-sort', key.dataSort(value));
+        }
+      });
+    });
+  }
+}
+
 class Legend {
   constructor(selector) {
     // Select legend container
@@ -1193,10 +1361,13 @@ class Legend {
 
 exports.Chart = Chart;
 exports.AreaChart = AreaChart;
+exports.BarHorizontalChart = BarHorizontalChart;
 exports.BarVerticalChart = BarVerticalChart;
 exports.LineChart = LineChart;
+exports.StackedBarHorizontalChart = StackedBarHorizontalChart;
 exports.StackedBarVerticalChart = StackedBarVerticalChart;
 exports.TreemapChart = TreemapChart;
+exports.Table = Table;
 exports.Legend = Legend;
 exports.Tooltip = Tooltip;
 exports.formatDefaultLocale = formatDefaultLocale;
