@@ -20,10 +20,12 @@ export default class BarVerticalChart extends Chart {
   }
 
   setTooltip() {
-    this.tooltip = new Tooltip(this, {
-      align: 'center',
-      valign: 'bottom'
-    })
+    if (this.config.tooltip) {
+      this.tooltip = new Tooltip(this, {
+        align: 'center',
+        valign: 'bottom'
+      })
+    }
   }
 
   // Render chart

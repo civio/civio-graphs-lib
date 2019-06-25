@@ -31,11 +31,13 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
   }
 
   setTooltip() {
-    this.tooltip = new TooltipStacked(this, {
-      align: 'center',
-      valign: 'bottom'
-      //background: true
-    })
+    if (this.config.tooltip) {
+      this.tooltip = new TooltipStacked(this, {
+        align: 'center',
+        valign: 'bottom'
+        //background: true
+      })
+    }
   }
 
   setData(data) {

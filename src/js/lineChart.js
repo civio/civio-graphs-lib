@@ -14,9 +14,11 @@ export default class LineChart extends Chart {
   }
 
   setTooltip() {
-    this.tooltip = new Tooltip(this, {
-      point: true
-    })
+    if (this.config.tooltip) {
+      this.tooltip = new Tooltip(this, {
+        point: true
+      })
+    }
   }
 
   // Render chart
