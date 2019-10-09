@@ -157,7 +157,7 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
         .filter(d => d === data[this.key])
         .classed('active', true)
       // highlight current bar
-      this.el.selectAll(`.bar-${data[this.key]}`).classed('active', true)
+      this.el.selectAll(`.bar-${slugify(data[this.key])}`).classed('active', true)
     }
     return this
   }
@@ -167,7 +167,7 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
     return `bar-stack bar-${slugify(d.key.toLowerCase())}`
   }
   barItemClass(d) {
-    return `bar-stack-item bar-${d.data[this.key]}`
+    return `bar-stack-item bar-${slugify(d.data[this.key])}`
   }
 
   // Set scale color for keys
