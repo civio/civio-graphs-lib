@@ -1,4 +1,4 @@
-// civio-graphs-lib v0.1.4 Copyright 2019 Raúl Díaz Poblete
+// civio-graphs-lib v0.1.5 Copyright 2019 Raúl Díaz Poblete
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-selection'), require('lodash'), require('d3-array'), require('d3-axis'), require('d3-format'), require('d3-scale'), require('d3-time'), require('d3-time-format'), require('d3-shape'), require('slugify'), require('d3-collection'), require('d3-interpolate'), require('d3-scale-chromatic'), require('d3-hierarchy')) :
 typeof define === 'function' && define.amd ? define(['exports', 'd3-selection', 'lodash', 'd3-array', 'd3-axis', 'd3-format', 'd3-scale', 'd3-time', 'd3-time-format', 'd3-shape', 'slugify', 'd3-collection', 'd3-interpolate', 'd3-scale-chromatic', 'd3-hierarchy'], factory) :
@@ -1132,7 +1132,7 @@ class StackedBarVerticalChart extends BarVerticalChart {
         .filter(d => d === data[this.key])
         .classed('active', true);
       // highlight current bar
-      this.el.selectAll(`.bar-${slugify(data[this.key])}`).classed('active', true);
+      this.el.selectAll(`.bar-${this.slugifyBarItemClasses(data[this.key])}`).classed('active', true);
     }
     return this
   }
@@ -1142,7 +1142,10 @@ class StackedBarVerticalChart extends BarVerticalChart {
     return `bar-stack bar-${slugify(d.key.toLowerCase())}`
   }
   barItemClass(d) {
-    return `bar-stack-item bar-${slugify(d.data[this.key])}`
+    return `bar-stack-item bar-${this.slugifyBarItemClasses(d.data[this.key])}`
+  }
+  slugifyBarItemClasses(d) {
+    return slugify(d, {remove: /\(\):/})
   }
 
   // Set scale color for keys
