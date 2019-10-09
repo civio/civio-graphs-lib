@@ -170,7 +170,7 @@ export default class StackedBarVerticalChart extends BarVerticalChart {
     return `bar-stack-item bar-${this.slugifyBarItemClasses(d.data[this.key])}`
   }
   slugifyBarItemClasses(d) {
-    return slugify(d, {remove: /\(\):/})
+    return slugify(d, {remove: /[()[\]:]/g})
   }
 
   // Set scale color for keys
